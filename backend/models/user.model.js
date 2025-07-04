@@ -21,5 +21,8 @@ const userSchema = new mongoose.Schema({
         ref : "Event"
     }],
     otp : String,
+    role : {
+        type : String ,
+    }
 })
 export const User = mongoose.model("User" , userSchema);

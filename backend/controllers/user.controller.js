@@ -51,7 +51,7 @@ const register = asyncHandler(async (req, res) => {
     //         success : false
     //     })
     // }
-
+  
     return res.status(200).send({
         message: "OTP sent to your email",
         success: true

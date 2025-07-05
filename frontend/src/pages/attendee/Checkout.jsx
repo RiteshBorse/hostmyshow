@@ -1,7 +1,53 @@
 import React from 'react'
 import { Calendar, MapPin, Ticket, DollarSign } from 'lucide-react'
+import { useState } from 'react';
+import axios from 'axios';
 
 const Checkout = () => {
+  const [amount, setamount] = useState(350);
+
+    // handlePayment Function
+    const handlePayment = async () => {
+        try {
+            const res = await axios.post(`${import.meta.env.VITE_API}/payment/order`, {
+                amount
+            });
+            console.log(res.data);
+            handlePaymentVerify(res.data.data)
+        } catch (error) {
+            console.log(error);
+        }
+    }
+    const handlePaymentVerify = async (data) => {
+      const options = {
+          key: import.meta.env.VITE_RAZORPAY_KEY,
+          amount: data.amount,
+          currency: data.currency,
+          name: "HostMyShow",
+          description: "Test Mode",
+          order_id: data.id,
+          handler: async (response) => {
+              console.log("response", response)
+              try {
+                  const res = await axios.post(`${import.meta.env.VITE_API}/payment/verify`, {
+                          razorpay_order_id: response.razorpay_order_id,
+                          razorpay_payment_id: response.razorpay_payment_id,
+                          razorpay_signature: response.razorpay_signature,
+                  });
+                  if (res.data.message) {
+                      toast.success(verifyData.message)
+                  }
+              } catch (error) {
+                  console.log(error);
+              }
+          },
+          theme: {
+              color: "#5f63b8"
+          }
+      };
+      const rzp1 = new window.Razorpay(options);
+        rzp1.open();
+    }
   // Mock data for selected event and seats
   const event = {
     title: "The Accountant²",
@@ -68,7 +114,7 @@ const Checkout = () => {
 
         {/* Payment Button */}
         <div className="relative w-full p-1 rounded-lg overflow-hidden shining-border">
-          <button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-lg transition-colors shadow-lg text-xl relative z-10">
+          <button onClick={handlePayment} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-lg transition-colors shadow-lg text-xl relative z-10">
             Proceed to Payment
           </button>
         </div>

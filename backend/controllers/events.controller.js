@@ -136,4 +136,36 @@ const postEvent = asyncHandler(async (req, res) => {
   });
 });
 
-export { getEvents, getEventById , postEvent };
+const getEventSeatsAndTimings = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  const event = await Event.findById(id).select("seatMap eventDateTime");
+
+  if (!event) {
+    return res.status(404).json({
+      success: false,
+      message: "Event not found.",
+    });
+  }
+
+  const formattedTimings = event.eventDateTime.map((dt) => {
+    const dateObj = new Date(dt);
+    return {
+      date: dateObj.toLocaleDateString("en-CA"), 
+      time: dateObj.toLocaleTimeString("en-US", {
+        hour: "numeric",
+        minute: "2-digit",
+        hour12: true,
+      }),
+    };
+  });
+
+  return res.status(200).json({
+    seatMap: event.seatMap,
+    eventDateTime: formattedTimings,
+    success: true,
+    message: "Event seats and timings fetched successfully",
+  });
+});
+
+export { getEvents, getEventById , postEvent , getEventSeatsAndTimings };

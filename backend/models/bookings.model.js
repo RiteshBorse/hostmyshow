@@ -28,6 +28,10 @@ const bookingSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
+  ticket_qr : {
+    type : String,
+    required : true
+  },
   event_status: {
     type: String,
     enum: ['upcoming', 'active', 'completed'],

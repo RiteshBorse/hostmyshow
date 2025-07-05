@@ -5,7 +5,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 
 const getEvents = asyncHandler(async (req, res) => {
   let events = await Event.find({}).select(
-    "-users -totalbookings -totalRevenue -certificate"
+    "-users -totalBookings -totalRevenue -certificate"
   );
   if (!events.length) {
     return res.status(400).send({
@@ -41,7 +41,7 @@ const getEventById = asyncHandler(async (req, res) => {
 const getEventSeatsAndTimings = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
-  const event = await Event.findById(id).select("seatMap eventDateTime");
+  const event = await Event.findById(id).select("seats seatMap eventDateTime cost");
 
   if (!event) {
     return res.status(404).json({
@@ -63,6 +63,8 @@ const getEventSeatsAndTimings = asyncHandler(async (req, res) => {
   });
 
   return res.status(200).json({
+    seats: event.seats,
+    cost : event.cost,
     seatMap: event.seatMap,
     eventDateTime: formattedTimings,
     success: true,

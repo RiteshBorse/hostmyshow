@@ -1,5 +1,9 @@
 import { Input } from '@/components/ui/input';
+import axios from 'axios';
 import React from 'react'
+import { useState } from 'react';
+import { useEffect } from 'react';
+import { Link } from 'react-router-dom';
 
 // Gold glowing animation for sponsored plate
 const goldGlowStyle = `
@@ -60,7 +64,7 @@ const plateStyles = {
   },
 };
 
-function EventCard({ title, date, category, location, image, description, plate }) {
+function EventCard({ _id, title, date, category, location, image, description, plate }) {
   return (
     <div className="glass rounded-xl shadow-lg overflow-hidden flex flex-col items-center relative">
       {plate && plateStyles[plate] && (
@@ -76,7 +80,7 @@ function EventCard({ title, date, category, location, image, description, plate 
           <span>{location}</span>
         </div>
         <p className="text-blue-100 mb-4 flex-1 text-center">{description}</p>
-        <button className="mt-auto bg-blue-700 hover:bg-blue-800 text-white font-semibold py-2 rounded-lg transition-colors shadow glow-blue w-full">View Details</button>
+        <Link to={`/events/${_id}`}><button className="mt-auto bg-blue-700 hover:bg-blue-800 text-white font-semibold py-2 rounded-lg transition-colors shadow glow-blue w-full">View Details</button></Link>
       </div>
     </div>
   );
@@ -91,53 +95,68 @@ const Events = () => {
   const [startDate, setStartDate] = React.useState("");
   const categories = ["All", "Conference", "Workshop", "Meetup", "Webinar"];
   const dateFilters = ["All", "Upcoming", "Past"];
-  const specialFilters = ["All", "Special Sponsored", "Spotlight Event", "Prime Listing", "Elite"];
-  const events = [
-    {
-      id: 1,
-      title: "React Summit 2024",
-      date: "2024-08-12",
-      category: "Conference",
-      location: "San Francisco, CA",
-      image: "https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=400&q=80",
-      description: "A global React conference with top speakers and workshops.",
-      special: "Special Sponsored"
-    },
-    {
-      id: 2,
-      title: "AI & ML Workshop",
-      date: "2024-09-05",
-      category: "Workshop",
-      location: "Online",
-      image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=400&q=80",
-      description: "Hands-on workshop on Artificial Intelligence and Machine Learning.",
-      special: "Spotlight Event"
-    },
-    {
-      id: 3,
-      title: "Tech Meetup Night",
-      date: "2024-07-20",
-      category: "Meetup",
-      location: "New York, NY",
-      image: "https://images.unsplash.com/photo-1515168833906-d2a3b82b3029?auto=format&fit=crop&w=400&q=80",
-      description: "Network with tech enthusiasts and professionals.",
-      special: "Prime Listing"
-    },
-    {
-      id: 4,
-      title: "Web Development Webinar",
-      date: "2024-10-10",
-      category: "Webinar",
-      location: "Online",
-      image: "https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=400&q=80",
-      description: "Learn the latest in web development from industry experts.",
-      special: "Elite"
-    },
-  ];
-
+  const specialFilters = ["All", "Special Sponsored", "Spotlight Event", "Prime Listing",
+   "Elite"];
+  const [events , setEvents] = useState([]);
+  // const events = [
+  //   {
+  //     id: 1,
+  //     title: "React Summit 2024",
+  //     date: "2024-08-12",
+  //     category: "Conference",
+  //     location: "San Francisco, CA",
+  //     image: "https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=400&q=80",
+  //     description: "A global React conference with top speakers and workshops.",
+  //     special: "Special Sponsored"
+  //   },
+  //   {
+  //     id: 2,
+  //     title: "AI & ML Workshop",
+  //     date: "2024-09-05",
+  //     category: "Workshop",
+  //     location: "Online",
+  //     image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=400&q=80",
+  //     description: "Hands-on workshop on Artificial Intelligence and Machine Learning.",
+  //     special: "Spotlight Event"
+  //   },
+  //   {
+  //     id: 3,
+  //     title: "Tech Meetup Night",
+  //     date: "2024-07-20",
+  //     category: "Meetup",
+  //     location: "New York, NY",
+  //     image: "https://images.unsplash.com/photo-1515168833906-d2a3b82b3029?auto=format&fit=crop&w=400&q=80",
+  //     description: "Network with tech enthusiasts and professionals.",
+  //     special: "Prime Listing"
+  //   },
+  //   {
+  //     id: 4,
+  //     title: "Web Development Webinar",
+  //     date: "2024-10-10",
+  //     category: "Webinar",
+  //     location: "Online",
+  //     image: "https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=400&q=80",
+  //     description: "Learn the latest in web development from industry experts.",
+  //     special: "Elite"
+  //   },
+  // ];
+  
+  const fetchEvent = async () => {
+      try {
+        const response = await axios.get(`${import.meta.env.VITE_API}/events/get-events`)
+        console.log(response.data);
+        setEvents(response.data.events)
+      } catch (error) {
+        console.log(error.response.data.message)
+        console.log(error)
+      }
+  }
+  useEffect(() => {
+    fetchEvent();
+  },[])
   // Filter and search logic
   const now = new Date();
-  const filteredEvents = events.filter((event, idx) => {
+  const filteredEvents = events?.filter((event) => {
     const matchesCategory = filter === "All" || event.category === filter;
     const matchesSearch = event.title.toLowerCase().includes(search.toLowerCase()) || event.description.toLowerCase().includes(search.toLowerCase());
     let matchesDate = true;
@@ -229,7 +248,7 @@ const Events = () => {
           ) : (
             filteredEvents.map((event) => (
               <EventCard
-                key={event.id}
+                _id = {event._id}
                 title={event.title}
                 date={event.date}
                 category={event.category}

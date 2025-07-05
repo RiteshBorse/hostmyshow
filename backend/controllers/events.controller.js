@@ -1,3 +1,4 @@
+import { Booking } from "../models/bookings.model.js";
 import { Event } from "../models/events.model.js";
 import { User } from "../models/user.model.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
@@ -70,12 +71,46 @@ const getEventSeatsAndTimings = asyncHandler(async (req, res) => {
 });
 
 const getMyEvents = asyncHandler(async(req , res) => {
+  const userId = req.user.id ;
+  const events = await Event.find({organizer : userId}).select("-seatMap")
+
+  if(!events.length)
+{
+  return res.status(404).json({
+    success : false , 
+    message : "You have not created any events yet"
+  }) ;
+}
+    return res.status(200).json({
+    success: true,
+    events,
+    message: "Events you organized fetched successfully"
+  });
 
 });
 
 const getMyEventById = asyncHandler(async(req , res) => {
 
+  const userId = req.user.id ;
+  const {id} = req.params ;
+
+  const event = await Event.findOne({_id : id , organizer : userId}).select("-seatMap");
+
+  if(!event)
+  {
+    return res.status(404).json({
+      success : false , 
+      message : "Event not found"
+    });
+  }
+
+  return res.status(200).json({
+    success : true , 
+    event , 
+    message : "Event fetched successfully !"
+  })
 })
+
 const postEvent = asyncHandler(async (req, res) => {
   if (req.user.role != "Organizer") {
     return res.status(400).send({
@@ -175,19 +210,109 @@ const postEvent = asyncHandler(async (req, res) => {
 });
 
 const updateMyEvent = asyncHandler(async(req , res) => {
+  const {id} =  req.params ;
+  const userId = req.user.id ;
 
+  const event = await Event.findOne({_id : id , organizer : userId });
+
+  if(!event) {
+    return res.status(404).json({
+      success  : true , 
+      message : "Event Not Found"
+    })
+  }
+
+  const updatedData = req.body ;
+
+  const updatedEvent = await Event.findByIdAndUpdate(id , updatedData , {
+    new : true
+  })
+
+  return res.status(200).json({
+    success : true , 
+    event  : updatedEvent ,
+    message : "Event Updated Successfully"
+  })
 });
 
-const deleteMyEvent = asyncHandler(async(req , res) => {
+const deleteMyEvent = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const userId = req.user.id;
+  const event = await Event.findOne({ _id: id, organizer: userId });
 
+  if (!event) {
+    return res.status(404).json({
+      success: false,
+      message: "Event not found "
+    });
+  }
+
+  if (event.status !== 'upcoming') {
+    return res.status(400).json({
+      success: false,
+      message: "Only upcoming events can be deleted",
+    });
+  }
+  const existingBookings = await Booking.find({ event_id: id });
+
+  if (existingBookings.length > 0) {
+    return res.status(400).json({
+      success: false,
+      message: "Event cannot be deleted because bookings already exist",
+    });
+  }
+  
+  await Event.findByIdAndDelete(id);
+
+  return res.status(200).json({
+    success: true,
+    message: "Event deleted successfully",
+  });
 });
 
+
+//Organizer
 const getBookings = asyncHandler(async(req , res) => {
+  const userId = req.user.id ;
 
+  const bookings = await Booking.find({ organizer_id : userId})
+  .populate("user_id" , )
+  .populate("event_id" , "title");
+
+  if(!bookings.length)
+  {
+    return res.status(404).json({
+      success : false , 
+      message : "No bookings" 
+    })
+  }
+    return res.status(200).json({
+    success: true,
+    bookings,
+    message: "Bookings fetched successfully",
+  });
 });
 
+//attendee
 const getMyBookings = asyncHandler(async(req , res) => {
-  /// attendeeee 
+  const userId = req.user.id ;
+  const bookings = await Booking.find({ user_id: userId })
+    .populate("event_id", "title eventDateTime location");
+
+    if (!bookings.length) {
+    return res.status(404).json({
+      success: false,
+      message: "You have not booked any events",
+    });
+  }
+
+  return res.status(200).json({
+    success: true,
+    bookings,
+    message: "Your bookings fetched successfully",
+  });
+
+
 })
 
 export { getEvents, getEventById, postEvent, getEventSeatsAndTimings , getMyEvents , getMyEventById , updateMyEvent , deleteMyEvent , getBookings , getMyBookings};

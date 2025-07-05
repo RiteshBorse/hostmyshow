@@ -7,7 +7,7 @@ const eventSchema = new mongoose.Schema({
   },
   description: String,
   location: String,
-  type: {
+  eventType: {
     type: String,
     enum: ['show', 'hackathon'],
     required: true
@@ -35,7 +35,7 @@ const eventSchema = new mongoose.Schema({
     default: 0
   },
   certificate: {
-    type: String
+    type: Boolean
   },
   special: {
     type: String,

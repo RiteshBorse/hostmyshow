@@ -8,7 +8,7 @@ export const authenticate = (req , res , next) => {
         if(err){
             return res.status(401).send({message : "Token not valid , Please Contact Admin" , success : false});
         }
-        req.user = decode.user;
+        req.user = decode;
         next()
     })
 }

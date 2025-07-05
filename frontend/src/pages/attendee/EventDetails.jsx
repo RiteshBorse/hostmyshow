@@ -1,28 +1,48 @@
 import React from 'react'
 import { Dialog, DialogTrigger, DialogContent, DialogClose } from '@/components/ui/dialog';
+import { useState } from 'react';
+import { useRef } from 'react';
+import { useEffect } from 'react';
+import axios from 'axios';
+import { Link, useParams } from 'react-router-dom';
 
 const EventDetails = () => {
   // Example event/movie data
-  const event = {
-    title: "The Accountant²",
-    language: "ENGLISH",
-    rating: 7.1,
-    userRating: "7.1 User Rating",
-    description:
-      "When an old acquaintance is murdered, Wolff is compelled to solve the case. Realizing more extreme measures are necessary, Wolff recruits his estranged and highly lethal brother, Brax, to help. In partnership with Marybeth Medina, they uncover a deadly conspiracy, becoming targets of a ruthless network of killers who will stop at nothing to keep their secrets buried.",
-    duration: "2h 13m",
-    genre: "Crime, Thriller, Action",
-    year: 2025,
-    poster: "https://m.media-amazon.com/images/I/91dAIcmOjAL._AC_UF1000,1000_QL80_.jpg",
-    banner: "https://m.media-amazon.com/images/S/pv-target-images/6f9297a0e0325abbab2384f140597954e79acdcd1dcc3965ed51491457f0235e._SX1080_FMjpg_.jpg",
-    trailer: "https://www.w3schools.com/html/mov_bbb.mp4" // Sample MP4 for demo
-  };
+  const [event , setEvent] = useState({});
+  const {id} = useParams();
+  // const event = {
+  //   title: "The Accountant²",
+  //   language: "ENGLISH",
+  //   rating: 7.1,
+  //   userRating: "7.1 User Rating",
+  //   description:
+  //     "When an old acquaintance is murdered, Wolff is compelled to solve the case. Realizing more extreme measures are necessary, Wolff recruits his estranged and highly lethal brother, Brax, to help. In partnership with Marybeth Medina, they uncover a deadly conspiracy, becoming targets of a ruthless network of killers who will stop at nothing to keep their secrets buried.",
+  //   duration: "2h 13m",
+  //   genre: "Crime, Thriller, Action",
+  //   year: 2025,
+  //   poster: "https://m.media-amazon.com/images/I/91dAIcmOjAL._AC_UF1000,1000_QL80_.jpg",
+  //   banner: "https://m.media-amazon.com/images/S/pv-target-images/6f9297a0e0325abbab2384f140597954e79acdcd1dcc3965ed51491457f0235e._SX1080_FMjpg_.jpg",
+  //   trailer: "https://www.w3schools.com/html/mov_bbb.mp4" // Sample MP4 for demo
+  // };
+  const fetchEvent = async () => {
+    console.log(id);
+    try {
+      const response = await axios.get(`${import.meta.env.VITE_API}/events/get-events/${id}`);
+      console.log(response.data)
+      setEvent(response.data.event);
+    } catch (error) {
+      console.log(error)
+    }
+  }
 
-  const [open, setOpen] = React.useState(false);
-  const videoRef = React.useRef(null);
+  const [open, setOpen] = useState(false);
+  const videoRef = useRef(null);
 
   // Reset video when dialog closes
-  React.useEffect(() => {
+  useEffect(()=> {
+    fetchEvent();
+  },[])
+  useEffect(() => {
     if (!open && videoRef.current) {
       videoRef.current.currentTime = 0;
     }
@@ -84,7 +104,7 @@ const EventDetails = () => {
                 </div>
               </DialogContent>
             </Dialog>
-            <button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-lg transition-colors shadow">Buy Tickets</button>
+            <Link to={`/seats/${id}`}><button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-lg transition-colors shadow">Buy Tickets</button></Link>
             <button className="bg-white/10 hover:bg-white/20 text-white font-semibold px-4 py-3 rounded-full transition-colors shadow border border-white/20 flex items-center justify-center"><span className="text-xl">♡</span></button>
           </div>
         </div>

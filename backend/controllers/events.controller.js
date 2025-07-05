@@ -311,8 +311,35 @@ const getMyBookings = asyncHandler(async(req , res) => {
     bookings,
     message: "Your bookings fetched successfully",
   });
-
-
 })
 
-export { getEvents, getEventById, postEvent, getEventSeatsAndTimings , getMyEvents , getMyEventById , updateMyEvent , deleteMyEvent , getBookings , getMyBookings};
+const getOrganizerSummary = asyncHandler(async (req , res) => {
+  const organizerId =  req.user.id ;
+
+  const totalBookings =await Booking.countDocuments({ organizer_id: organizerId })
+
+  const bookings = await Booking.find({ organizer_id: organizerId }).select("paymentAmt");
+
+  let totalRevenue = 0;
+  for (let b of bookings) 
+  {
+    totalRevenue += b.paymentAmt;
+  }
+  const totalActiveEvents = await Event.countDocuments({
+    organizer: organizerId,
+    status: "active"
+  });
+
+  return res.status(200).json({
+    success: true,
+    message: "Dashboard stats fetched",
+    counts: {
+      totalBookings,
+      totalRevenue,
+      totalActiveEvents
+    }
+  });
+})
+
+
+export { getEvents, getEventById, postEvent, getEventSeatsAndTimings , getMyEvents , getMyEventById , updateMyEvent , deleteMyEvent , getBookings , getMyBookings , getOrganizerSummary};

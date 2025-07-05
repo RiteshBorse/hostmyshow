@@ -17,7 +17,8 @@ import ListShows from './pages/organizer/ListShows'
 import ListBookings from './pages/organizer/ListBookings'
 import AdminDashboard from './pages/admin/Dashboard'
 import AboutUs from './pages/AboutUs'
-
+import axios from 'axios'
+axios.defaults.withCredentials = true;
 const App = () => {
   return (
     <BrowserRouter>

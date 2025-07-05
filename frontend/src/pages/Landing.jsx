@@ -69,7 +69,7 @@ const testimonials = [
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
-            <Link href="/dashboard">
+            <Link to="/organizer/dashboard">
               <Button
                 size="lg"
                 className="px-8 py-6 text-lg bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 glow-blue"
@@ -78,14 +78,15 @@ const testimonials = [
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
             </Link>
-            <Button
+            <Link to='/events'><Button
               variant="outline"
               size="lg"
-              className="px-8 py-6 text-lg border-blue-400/30 text-blue-100 hover:bg-blue-400/10 bg-transparent"
+              className="px-8 py-6 text-lg border-blue-400/30 text-blue-100 hover:bg-white/10 hover:text-white bg-transparent"
             >
               <Play className="mr-2 w-5 h-5" />
               Join Event
             </Button>
+            </Link>
           </div>
 
           {/* Platform Preview */}

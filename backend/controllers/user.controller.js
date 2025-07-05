@@ -1,5 +1,6 @@
 import { User } from "../models/user.model.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
+import { mail, otpFormat } from "../utils/email.js";
 import { generateOTP } from "../utils/generateOTP.js";
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
@@ -37,6 +38,19 @@ const register = asyncHandler(async (req, res) => {
     await user.save();
 
     // TODO: Send OTP via email here
+    const content = {
+        to : user.email,
+        subject : "HostMyShow OTP Verification",
+        html : otpFormat(user.username , otp)
+    };
+
+    const sent = await mail(content);
+    if(!sent){
+        return res.status(400).send({
+            message : "Problem with sending OTP",
+            success : false
+        })
+    }
 
     return res.status(200).send({
         message: "OTP sent to your email",

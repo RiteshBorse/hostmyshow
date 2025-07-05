@@ -37,13 +37,52 @@ const getEventById = asyncHandler(async (req, res) => {
   });
 });
 
+const getEventSeatsAndTimings = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  const event = await Event.findById(id).select("seatMap eventDateTime");
+
+  if (!event) {
+    return res.status(404).json({
+      success: false,
+      message: "Event not found.",
+    });
+  }
+
+  const formattedTimings = event.eventDateTime.map((dt) => {
+    const dateObj = new Date(dt);
+    return {
+      date: dateObj.toLocaleDateString("en-CA"),
+      time: dateObj.toLocaleTimeString("en-US", {
+        hour: "numeric",
+        minute: "2-digit",
+        hour12: true,
+      }),
+    };
+  });
+
+  return res.status(200).json({
+    seatMap: event.seatMap,
+    eventDateTime: formattedTimings,
+    success: true,
+    message: "Event seats and timings fetched successfully",
+  });
+});
+
+const getMyEvents = asyncHandler(async(req , res) => {
+
+});
+
+const getMyEventById = asyncHandler(async(req , res) => {
+
+})
 const postEvent = asyncHandler(async (req, res) => {
-    if(req.user.role != "Organizer"){
-        return res.status(400).send({
-            message : "You need to create a new account for organizing events",
-            success : false
-        })
-    }
+  if (req.user.role != "Organizer") {
+    return res.status(400).send({
+      message: "You need to create a new account for organizing events",
+      success: false,
+    });
+  }
   const {
     title,
     description,
@@ -122,12 +161,11 @@ const postEvent = asyncHandler(async (req, res) => {
     cost,
     certificate,
     special,
-    organizer : req.user.id
+    organizer: req.user.id,
   });
 
-    user.eventsOrganized.push(event._id);
-    await user.save();
-
+  user.eventsOrganized.push(event._id);
+  await user.save();
 
   return res.status(201).json({
     event,
@@ -136,36 +174,20 @@ const postEvent = asyncHandler(async (req, res) => {
   });
 });
 
-const getEventSeatsAndTimings = asyncHandler(async (req, res) => {
-  const { id } = req.params;
+const updateMyEvent = asyncHandler(async(req , res) => {
 
-  const event = await Event.findById(id).select("seatMap eventDateTime");
-
-  if (!event) {
-    return res.status(404).json({
-      success: false,
-      message: "Event not found.",
-    });
-  }
-
-  const formattedTimings = event.eventDateTime.map((dt) => {
-    const dateObj = new Date(dt);
-    return {
-      date: dateObj.toLocaleDateString("en-CA"), 
-      time: dateObj.toLocaleTimeString("en-US", {
-        hour: "numeric",
-        minute: "2-digit",
-        hour12: true,
-      }),
-    };
-  });
-
-  return res.status(200).json({
-    seatMap: event.seatMap,
-    eventDateTime: formattedTimings,
-    success: true,
-    message: "Event seats and timings fetched successfully",
-  });
 });
 
-export { getEvents, getEventById , postEvent , getEventSeatsAndTimings };
+const deleteMyEvent = asyncHandler(async(req , res) => {
+
+});
+
+const getBookings = asyncHandler(async(req , res) => {
+
+});
+
+const getMyBookings = asyncHandler(async(req , res) => {
+  /// attendeeee 
+})
+
+export { getEvents, getEventById, postEvent, getEventSeatsAndTimings , getMyEvents , getMyEventById , updateMyEvent , deleteMyEvent , getBookings , getMyBookings};

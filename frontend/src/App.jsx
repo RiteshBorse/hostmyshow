@@ -1,5 +1,5 @@
 import React from 'react'
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom'
 import Landing from './pages/Landing'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
@@ -18,7 +18,23 @@ import ListBookings from './pages/organizer/ListBookings'
 import AdminDashboard from './pages/admin/Dashboard'
 import AboutUs from './pages/AboutUs'
 import axios from 'axios'
+import { userStore } from './context/userContext'
+
 axios.defaults.withCredentials = true;
+
+// Protected Route Component for Organizer
+const ProtectedOrganizerRoute = ({ children }) => {
+  const isAuth = userStore((state) => state.isAuth);
+  const user = userStore((state) => state.user);
+  if (!isAuth) {
+    return <Navigate to="/login" replace />;
+  }
+  if (user?.role !== 'Organizer') {
+    return <Navigate to="/" replace />;
+  }
+  return children;
+};
+
 const App = () => {
   return (
     <BrowserRouter>
@@ -30,11 +46,15 @@ const App = () => {
         <Route path="/profile" element={<Profile/>}/>
         <Route path="/about-us" element={<AboutUs/>}/>
         <Route path="/events" element={<Events/>}/>
-        <Route path="/event-details" element={<EventDetails/>}/>
-        <Route path="/seats" element={<Seats/>}/>
+        <Route path="/events/:id" element={<EventDetails/>}/>
+        <Route path="/seats/:id" element={<Seats/>}/>
         <Route path="/checkout" element={<Checkout/>}/>
 
-        <Route path="/organizer" element={<Dashboard />}>
+        <Route path="/organizer" element={
+          <ProtectedOrganizerRoute>
+            <Dashboard />
+          </ProtectedOrganizerRoute>
+        }>
           <Route path="dashboard" element={<DashboardHome />} />
           <Route path="add-event" element={<AddEvent />} />
           <Route path="list-shows" element={<ListShows />} />

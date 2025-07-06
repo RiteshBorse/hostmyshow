@@ -16,6 +16,8 @@ import AddEvent from './pages/organizer/AddEvent'
 import ListShows from './pages/organizer/ListShows'
 import ListBookings from './pages/organizer/ListBookings'
 import AdminDashboard from './pages/admin/Dashboard'
+import ShowDetails from './pages/organizer/ShowDetails'
+import EditEvent from './pages/organizer/EditEvent'
 import AboutUs from './pages/AboutUs'
 import axios from 'axios'
 import { userStore } from './context/userContext'
@@ -60,6 +62,8 @@ const App = () => {
           <Route path="add-event" element={<AddEvent />} />
           <Route path="list-shows" element={<ListShows />} />
           <Route path="list-bookings" element={<ListBookings />} />
+          <Route path="show/:id" element={<ShowDetails />} />
+          <Route path="edit-event/:id" element={<EditEvent />} />
         </Route>
 
         <Route path="/admin" element={<AdminDashboard />} />

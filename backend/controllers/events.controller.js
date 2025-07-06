@@ -3,6 +3,7 @@ import { Event } from "../models/events.model.js";
 import { User } from "../models/user.model.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import QRCode from 'qrcode';
+import { areArraysEqual } from "../utils/arrayUtils.js";
 
 const getEvents = asyncHandler(async (req, res) => {
   let events = await Event.find({}).select(
@@ -97,19 +98,19 @@ const getMyEventById = asyncHandler(async(req , res) => {
   const userId = req.user.id ;
   const {id} = req.params ;
 
-  const event = await Event.findOne({_id : id , organizer : userId}).select("-seatMap");
+  const event = await Event.findOne({_id : id , organizer : userId});
 
   if(!event)
   {
     return res.status(404).json({
-      success : false , 
+      success : false ,
       message : "Event not found"
     });
   }
 
   return res.status(200).json({
-    success : true , 
-    event , 
+    success : true ,
+    event ,
     message : "Event fetched successfully !"
   })
 })
@@ -167,10 +168,7 @@ const postEvent = asyncHandler(async (req, res) => {
     for (let r = 0; r < rows; r++) {
       const rowLabel = String.fromCharCode(65 + r); // 'A' + r
       for (let c = 1; c <= cols; c++) {
-        finalSeatMap.push({
-          seatLabel: `${rowLabel}${c}`,
-          isBooked: false,
-        });
+        finalSeatMap.push({ seatLabel: `${rowLabel}${c}`, isBooked: false });
       }
     }
   } else if (seats.type === "direct") {
@@ -196,7 +194,7 @@ const postEvent = asyncHandler(async (req, res) => {
     banner,
     image,
     eventDateTime,
-    seats: seats.type,
+    seats,
     seatMap: finalSeatMap,
     cost,
     certificate,
@@ -222,19 +220,102 @@ const updateMyEvent = asyncHandler(async(req , res) => {
 
   if(!event) {
     return res.status(404).json({
-      success  : true , 
+      success  : false ,
       message : "Event Not Found"
     })
   }
 
-  const updatedData = req.body ;
+  const { seats: newSeats, seatMap: newDirectSeatMap, ...restOfUpdatedData } = req.body;
 
-  const updatedEvent = await Event.findByIdAndUpdate(id , updatedData , {
-    new : true
-  })
+  // Check if seat configuration is changing
+  // It's crucial to compare against the *current* state of event.seats and event.seatMap
+  const isSeatConfigChanging =
+    (newSeats?.type && newSeats.type !== event.seats.type) ||
+    (newSeats?.type === 'RowColumns' && newSeats.value !== event.seats.value) ||
+    (newSeats?.type === 'direct' && newDirectSeatMap && !areArraysEqual(newDirectSeatMap, event.seatMap));
+
+  let finalSeatMap = event.seatMap; // Default to existing map
+  let finalSeatsObject = event.seats; // Default to existing seats object
+
+  if (isSeatConfigChanging) {
+    const existingBookings = await Booking.find({ event_id: id });
+    if (existingBookings.length > 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Cannot change seating configuration: bookings already exist for this event.",
+      });
+    }
+
+    // Regenerate seatMap based on new configuration
+    if (newSeats.type === "RowColumns") {
+      const [rows, cols] = newSeats.value.split("x").map(Number);
+      if (isNaN(rows) || isNaN(cols) || rows < 1 || cols < 1) {
+        return res.status(400).json({ success: false, message: "Invalid RowColumns format for seating." });
+      }
+      finalSeatMap = [];
+      for (let r = 0; r < rows; r++) {
+        const rowLabel = String.fromCharCode(65 + r);
+        for (let c = 1; c <= cols; c++) {
+          finalSeatMap.push({ seatLabel: `${rowLabel}${c}`, isBooked: false });
+        }
+      }
+    } else if (newSeats.type === "direct") {
+      if (!Array.isArray(newDirectSeatMap) || newDirectSeatMap.length === 0) {
+        return res.status(400).json({ success: false, message: "Seat map is required for direct seat type." });
+      }
+      // Ensure new seats are not booked by default if the map is provided directly
+      finalSeatMap = newDirectSeatMap.map(seat => ({ ...seat, isBooked: false }));
+    } else {
+        return res.status(400).json({ success: false, message: "Invalid seats.type. Must be 'RowColumns' or 'direct'." });
+    }
+    finalSeatsObject = newSeats; // Use the new seats object
+  } else {
+    if (newSeats) {
+        finalSeatsObject = newSeats;
+    }
+  }
+
+  // Debugging: Log finalSeatMap before update
+  console.log("Final Seat Map before update:", finalSeatMap);
+  console.log("Final Seat Map length:", finalSeatMap.length);
+
+  // Construct a single update document for all fields EXCEPT seatMap
+  let updateDoc = {
+    ...restOfUpdatedData,
+  };
+
+  if (isSeatConfigChanging) {
+    updateDoc.seats = finalSeatsObject;
+  } else {
+    if (newSeats) {
+        updateDoc.seats = newSeats;
+    }
+  }
+
+  const updatedEvent = await Event.findByIdAndUpdate(
+    id,
+    { $set: updateDoc },
+    { new: true, runValidators: true }
+  );
+
+  if (!updatedEvent) {
+    return res.status(404).json({ success: false, message: "Event not found after update attempt." });
+  }
+
+  // If seat configuration changed, perform separate operations to unset and then set seatMap
+  // This is a workaround to avoid potential Mongoose recursion issues with array replacement.
+  if (isSeatConfigChanging) {
+    // 1. Unset (remove) the existing seatMap field
+    await Event.updateOne({ _id: id }, { $unset: { seatMap: "" } });
+    // 2. Set (add) the new seatMap array
+    await Event.updateOne({ _id: id }, { $set: { seatMap: finalSeatMap } });
+    
+    // Refresh the updatedEvent object to include the latest seatMap
+    updatedEvent.seatMap = finalSeatMap;
+  }
 
   return res.status(200).json({
-    success : true , 
+    success : true ,
     event  : updatedEvent ,
     message : "Event Updated Successfully"
   })

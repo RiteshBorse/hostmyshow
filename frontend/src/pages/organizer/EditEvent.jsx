@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import {
@@ -13,12 +13,15 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import axios from 'axios';
 import toast from 'react-hot-toast';
-import { useNavigate } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 
 const eventTypes = ['Hackathon', 'Live Show'];
 const totalSteps = 4;
 
-const AddEvent = () => {
+const EditEvent = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+
   const [step, setStep] = useState(1);
   const [form, setForm] = useState({
     title: '',
@@ -37,7 +40,43 @@ const AddEvent = () => {
     seats: '',
     cost: '',
   });
-  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchEvent = async () => {
+      try {
+        const res = await axios.get(`${import.meta.env.VITE_API}/events/get-my-events/${id}`, { withCredentials: true });
+        const eventData = res.data.event;
+        if (eventData) {
+          const eventDate = eventData.eventDateTime.length > 0 ? new Date(eventData.eventDateTime[0]).toISOString().split('T')[0] : '';
+          const formattedTimes = eventData.eventDateTime.map(dt => new Date(dt).toTimeString().slice(0, 5));
+          setForm({
+            title: eventData.title,
+            description: eventData.description,
+            location: eventData.location,
+            type: eventData.eventType,
+            times: formattedTimes.length > 0 ? formattedTimes : [''],
+            date: eventDate,
+            banner: eventData.banner,
+            image: eventData.image || '',
+            certificate: eventData.certificate || false,
+            personalized: eventData.special === 'personalized',
+            seatMode: eventData.seats === 'RowColumns' ? 'rows-cols' : 'direct',
+            rows: eventData.seats === 'RowColumns' && eventData.seatMap.length > 0 ? Math.floor(eventData.seatMap.length / (eventData.seatMap[0].seatLabel.match(/\d+/)?.[0] || 1)) : '',
+            cols: eventData.seats === 'RowColumns' && eventData.seatMap.length > 0 ? (eventData.seatMap[0].seatLabel.match(/\d+/)?.[0] || 1) : '',
+            seats: eventData.seats === 'direct' ? eventData.seatMap.length : '',
+            cost: eventData.cost,
+          });
+        }
+        setLoading(false);
+      } catch (error) {
+        toast.error(error.response?.data?.message || 'Failed to load event for editing');
+        setLoading(false);
+        navigate('/organizer/list-shows'); // Redirect if event not found or error
+      }
+    };
+    fetchEvent();
+  }, [id, navigate]);
 
   // Handlers
   const handleChange = (e) => {
@@ -65,11 +104,11 @@ const AddEvent = () => {
 
   const next = () => setStep((s) => s + 1);
   const back = () => setStep((s) => s - 1);
-  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validation
+    // Validation (similar to AddEvent.jsx)
     if (!form.title.trim()) {
       toast.error('Title is required');
       return;
@@ -130,7 +169,7 @@ const AddEvent = () => {
         type: 'RowColumns',
         value: `${form.rows}x${form.cols}`
       };
-      seatMap = undefined;
+      seatMap = undefined; // Will be generated in backend
     } else {
       seats = {
         type: 'direct'
@@ -157,24 +196,32 @@ const AddEvent = () => {
     };
 
     try {
-      const res = await axios.post(`${import.meta.env.VITE_API}/events/add-events`, payload, { withCredentials: true });
-      toast.success('Event created successfully!');
-      navigate('/organizer/dashboard');
+      const res = await axios.post(`${import.meta.env.VITE_API}/events/update-my-event/${id}`, payload, { withCredentials: true });
+      toast.success('Event updated successfully!');
+      navigate('/organizer/list-shows');
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Failed to create event');
+      toast.error(error.response?.data?.message || 'Failed to update event');
     }
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-white text-xl">
+        Loading event for editing...
+      </div>
+    );
+  }
+
   return (
     <div className="p-10 text-white w-[80vw] max-w-5xl mx-auto">
-      <h1 className="text-3xl font-bold mb-6">Add Event</h1>
+      <h1 className="text-3xl font-bold mb-6">Edit Event</h1>
       {/* Progress Bar */}
       <div className="mb-8">
         <Progress value={(step / totalSteps) * 100} className="h-3 text-blue-500 bg-blue-900" />
         <div className="text-blue-300 text-sm mt-2 text-right">Step {step} of {totalSteps}</div>
       </div>
       <form onSubmit={handleSubmit} className="space-y-8 w-full">
-        {/* Step 1: Basic Info + Banner */}
+        {/* Step 1: Basic Info + Banner */} 
         {step === 1 && (
           <div className="space-y-4 glass py-8 px-16 flex flex-col w-full rounded-2xl">
             <div>
@@ -291,7 +338,7 @@ const AddEvent = () => {
             </div>
             <div className="flex justify-between">
               <Button type="button" variant="secondary" className="bg-gray-700 hover:bg-gray-800 text-white" onClick={back}>Back</Button>
-              <Button type="submit" variant="success" className="bg-green-600 hover:bg-green-700 text-white">Submit</Button>
+              <Button type="submit" variant="success" className="bg-green-600 hover:bg-green-700 text-white">Update Event</Button>
             </div>
           </div>
         )}
@@ -300,4 +347,4 @@ const AddEvent = () => {
   );
 };
 
-export default AddEvent; 
+export default EditEvent; 

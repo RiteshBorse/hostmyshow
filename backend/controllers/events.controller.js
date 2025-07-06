@@ -2,6 +2,7 @@ import { Booking } from "../models/bookings.model.js";
 import { Event } from "../models/events.model.js";
 import { User } from "../models/user.model.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
+import QRCode from 'qrcode';
 
 const getEvents = asyncHandler(async (req, res) => {
   let events = await Event.find({}).select(
@@ -317,4 +318,130 @@ const getMyBookings = asyncHandler(async(req , res) => {
 
 })
 
-export { getEvents, getEventById, postEvent, getEventSeatsAndTimings , getMyEvents , getMyEventById , updateMyEvent , deleteMyEvent , getBookings , getMyBookings};
+const checkSeatsAvailability = asyncHandler(async (req, res) => {
+  const { event_id, seats } = req.body; // seats: array of seat labels, e.g. ['A1', 'A2']
+
+  if (!event_id || !Array.isArray(seats) || seats.length === 0) {
+    return res.status(400).json({
+      success: false,
+      message: "Event ID and seats array are required."
+    });
+  }
+
+  const event = await Event.findById(event_id).select("seatMap");
+  if (!event) {
+    return res.status(404).json({
+      success: false,
+      message: "Event not found."
+    });
+  }
+
+  const seatSet = new Set(seats);
+  const alreadyBooked = event.seatMap
+    .filter(seatObj => seatSet.has(seatObj.seatLabel) && seatObj.isBooked)
+    .map(seatObj => seatObj.seatLabel);
+
+  if (alreadyBooked.length > 0) {
+    return res.status(400).json({
+      success: true,
+      available: false,
+      alreadyBooked,
+      message: `Some seats are already booked: ${alreadyBooked.join(', ')}`
+    });
+  }
+  return res.status(200).json({
+    success: true,
+    available: true,
+    message: "All selected seats are available."
+  });
+});
+  
+
+
+
+const generateTicketQR = async (data) => {
+  const qrContent = JSON.stringify(data);
+  return await QRCode.toDataURL(qrContent); // base64 image
+};
+
+const bookTicket = asyncHandler(async (req, res) => {
+  const user_id = req.user.id;
+  const { event_id, booking_dateTime, seats, payment_id, paymentAmt } = req.body;
+  console.log(req.body)
+  if (!event_id || !booking_dateTime || !seats || !payment_id || !paymentAmt) {
+    return res.status(400).json({
+      success: false,
+      message: 'All fields are required.',
+    });
+  }
+
+  const event = await Event.findById(event_id);
+  if (!event) {
+    return res.status(404).json({
+      success: false,
+      message: 'Event not found.',
+    });
+  }
+
+  const seatList = seats.split(',').map(s => s.trim());
+
+  const invalidSeats = [];
+  const updatedSeatMap = event.seatMap.map(seatObj => {
+    if (seatList.includes(seatObj.seatLabel)) {
+      if (seatObj.isBooked) {
+        invalidSeats.push(seatObj.seatLabel);
+      }
+      return { ...seatObj, isBooked: true };
+    }
+    return seatObj;
+  });
+
+  if (invalidSeats.length > 0) {
+    return res.status(400).json({
+      success: false,
+      message: `These seats are already booked: ${invalidSeats.join(', ')}`,
+    });
+  }
+
+  // Save updated seat status
+  event.seatMap = updatedSeatMap;
+  await event.save();
+
+  // Get event organizer
+  const organizer_id = event.organizer;
+
+  // Generate QR code
+  const qrCodeData = {
+    event: event_id,
+    user: user_id,
+    seats: seatList,
+    time: booking_dateTime,
+    payment: payment_id
+  };
+  const qrCode = await generateTicketQR(qrCodeData);
+
+  // Create booking
+  const booking = await Booking.create({
+    user_id,
+    event_id,
+    event_title : event.title,
+    organizer_id,
+    booking_dateTime,
+    seats: seatList.join(','),
+    ticket_qr: qrCode,
+    payment_id,
+    paymentAmt
+  });
+  event.totalBookings = (event.totalBookings || 0) + 1;
+  event.totalRevenue = (event.totalRevenue || 0) + Number(paymentAmt);
+  await event.save();
+
+  res.status(201).json({
+    success: true,
+    message: 'Booking successful!',
+    booking
+  });
+});
+
+
+export { getEvents, getEventById, postEvent, getEventSeatsAndTimings , getMyEvents , getMyEventById , updateMyEvent , deleteMyEvent , getBookings , getMyBookings , bookTicket , checkSeatsAvailability};

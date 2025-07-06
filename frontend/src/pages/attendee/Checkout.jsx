@@ -1,9 +1,121 @@
 import React from 'react'
 import { Calendar, MapPin, Ticket, DollarSign } from 'lucide-react'
+import { useState } from 'react';
+import axios from 'axios';
+import { useParams, useLocation } from 'react-router-dom';
+import toast from 'react-hot-toast';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
 
 const Checkout = () => {
-  // Mock data for selected event and seats
-  const event = {
+  const { id } = useParams();
+  const location = useLocation();
+  
+  // Get data passed from Seats page
+  const {
+    selectedSeats = [],
+    selectedTiming = '',
+    totalAmount = 0,
+    ticketCost = 0,
+    eventData = null
+  } = location.state || {};
+
+  const [amount, setamount] = useState(totalAmount + 50);
+  const [ticketData, setTicketData] = useState(null); // Store ticket from backend
+  const [showTicketOptions, setShowTicketOptions] = useState(false); // Show download/share buttons
+  
+  // Log received data
+  console.log('Checkout received data:');
+  console.log('Selected Seats:', selectedSeats);
+  console.log('Selected Timing:', selectedTiming);
+  console.log('Total Amount:', totalAmount);
+  console.log('Event Data:', eventData);
+
+  // If no data was passed, redirect back to events
+  if (!location.state) {
+    console.log('No data received, redirecting to events');
+    window.location.href = '/events';
+    return null;
+  }
+
+  // handlePayment Function
+  const handlePayment = async () => {
+    try {
+      const res = await axios.post(`${import.meta.env.VITE_API}/payment/order`, {
+        amount
+      });
+      console.log(res.data);
+      handlePaymentVerify(res.data.data)
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  const handlePaymentVerify = async (data) => {
+    try {
+      let checkSeats = await axios.post(`${import.meta.env.VITE_API}/events/check-seats` , {
+        event_id : id,
+        seats : selectedSeats
+      });
+      console.log(checkSeats)
+    } catch (error) {
+      toast.error(error.response.data.message);
+      return;
+    }
+    const options = {
+      key: import.meta.env.VITE_RAZORPAY_KEY,
+      amount: data.amount,
+      currency: data.currency,
+      name: "HostMyShow",
+      description: "Test Mode",
+      order_id: data.id,
+      handler: async (response) => {
+        console.log("response", response)
+        try {
+          const ticket = await axios.post(`${import.meta.env.VITE_API}/events/book-ticket`, {
+            event_id: id,
+            booking_dateTime: new Date().toISOString(),
+            seats: selectedSeats.join(','),
+            payment_id: response.razorpay_payment_id,
+            paymentAmt: finalTotal
+          });
+
+          if(!ticket.data.success){
+            toast.error(ticket.data.message);
+            return ;
+          }
+          const res = await axios.post(`${import.meta.env.VITE_API}/payment/verify`, {
+            razorpay_order_id: response.razorpay_order_id,
+            razorpay_payment_id: response.razorpay_payment_id,
+            razorpay_signature: response.razorpay_signature,
+          });
+
+          if (ticket.data.message) {
+            toast.success(ticket.data.message);
+            setTicketData(ticket.data.booking); // Save ticket data
+            setShowTicketOptions(true); // Show download/share buttons
+          }
+        } catch (error) {
+          toast.error(error.response.data.message);
+        }
+      },
+      theme: {
+        color: "#5f63b8"
+      }
+    };
+    const rzp1 = new window.Razorpay(options);
+    rzp1.open();
+  }
+
+  // Mock data for selected event and seats - now using real data from props
+  const event = eventData ? {
+    title: eventData.title || "The Accountant²",
+    date: selectedTiming.split(' ')[0] || "2025-08-12",
+    time: selectedTiming.split(' ')[1] || "7:30 PM",
+    location: eventData.venue || "PVR Cinemas, Downtown",
+    poster: eventData.poster || "https://m.media-amazon.com/images/I/91dAIcmOjAL._AC_UF1000,1000_QL80_.jpg",
+    duration: eventData.duration || "2h 15m",
+    genre: eventData.genre || "Action, Thriller",
+  } : {
     title: "The Accountant²",
     date: "2025-08-12",
     time: "7:30 PM",
@@ -12,10 +124,117 @@ const Checkout = () => {
     duration: "2h 15m",
     genre: "Action, Thriller",
   };
-  const selectedSeats = ["B5", "B6", "B7"];
-  const seatPrice = 350;
+  
+  const seatPrice = ticketCost || 350;
   const convenienceFee = 50;
-  const total = selectedSeats.length * seatPrice + convenienceFee;
+  const finalTotal = selectedSeats.length * seatPrice + convenienceFee;
+
+  // PDF generation function
+  const generatePDF = () => {
+    if (!ticketData) return;
+    const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+
+    // HostMyShow logo as styled text
+    doc.setFontSize(28);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor('#3b82f6');
+    doc.text('Host', 40, 60);
+    doc.setTextColor('#22223b');
+    doc.text('MyShow', 100, 60);
+
+    // Movie title
+    doc.setFontSize(20);
+    doc.setTextColor('#22223b');
+    doc.text(ticketData.event_title || 'Event', 40, 100);
+
+    // Details
+    doc.setFontSize(12);
+    let y = 130;
+    doc.text(`Date & Time: ${event.date} ${event.time}`, 40, y);
+    y += 20;
+    doc.text(`Venue: ${event.location}`, 40, y);
+    y += 20;
+    doc.text(`Screen: SCREEN 1`, 40, y);
+    y += 20;
+    doc.text(`Seats: ${ticketData.seats}`, 40, y);
+    y += 20;
+    doc.text(`Booking ID: ${ticketData._id || ticketData.booking_id || ''}`, 40, y);
+    y += 20;
+    doc.text(`Amount Paid: ₹${ticketData.paymentAmt}`, 40, y);
+    y += 30;
+
+    // QR code (base64)
+    if (ticketData.ticket_qr) {
+      doc.text('Scan for entry:', 40, y);
+      y += 10;
+      doc.addImage(ticketData.ticket_qr, 'PNG', 40, y, 100, 100);
+      y += 110;
+    }
+
+    // Message
+    doc.setFontSize(13);
+    doc.setTextColor('#3b82f6');
+    doc.text('Enjoy your show! Please arrive 15 minutes early. For support, contact HostMyShow.', 40, y + 30);
+
+    // Save
+    doc.save(`HostMyShow_Ticket_${ticketData._id || 'booking'}.pdf`);
+  };
+
+  // Web Share API for PDF
+  const sharePDF = async () => {
+    if (!ticketData) return;
+    const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+    // ... same as generatePDF ...
+    // HostMyShow logo as styled text
+    doc.setFontSize(28);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor('#3b82f6');
+    doc.text('Host', 40, 60);
+    doc.setTextColor('#22223b');
+    doc.text('MyShow', 100, 60);
+    doc.setFontSize(20);
+    doc.setTextColor('#22223b');
+    doc.text(ticketData.event_title || 'Event', 40, 100);
+    doc.setFontSize(12);
+    let y = 130;
+    doc.text(`Date & Time: ${event.date} ${event.time}`, 40, y);
+    y += 20;
+    doc.text(`Venue: ${event.location}`, 40, y);
+    y += 20;
+    doc.text(`Screen: SCREEN 1`, 40, y);
+    y += 20;
+    doc.text(`Seats: ${ticketData.seats}`, 40, y);
+    y += 20;
+    doc.text(`Booking ID: ${ticketData._id || ticketData.booking_id || ''}`, 40, y);
+    y += 20;
+    doc.text(`Amount Paid: ₹${ticketData.paymentAmt}`, 40, y);
+    y += 30;
+    if (ticketData.ticket_qr) {
+      doc.text('Scan for entry:', 40, y);
+      y += 10;
+      doc.addImage(ticketData.ticket_qr, 'PNG', 40, y, 100, 100);
+      y += 110;
+    }
+    doc.setFontSize(13);
+    doc.setTextColor('#3b82f6');
+    doc.text('Enjoy your show! Please arrive 15 minutes early. For support, contact HostMyShow.', 40, y + 30);
+    // Share
+    const pdfBlob = doc.output('blob');
+    if (navigator.share) {
+      const file = new File([pdfBlob], `HostMyShow_Ticket_${ticketData._id || 'booking'}.pdf`, { type: 'application/pdf' });
+      try {
+        await navigator.share({
+          files: [file],
+          title: 'Your HostMyShow Ticket',
+          text: 'Here is your ticket!'
+        });
+      } catch (err) {
+        toast.error('Sharing cancelled or failed.');
+      }
+    } else {
+      toast.error('Sharing not supported on this device.');
+    }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-12 ">
@@ -61,17 +280,24 @@ const Checkout = () => {
           <div className="w-full flex justify-between items-center text-white font-bold text-2xl pt-4 border-t border-blue-400/20">
             <span>Total Payable</span>
             <span className="flex items-center gap-2">
-              <DollarSign className="w-5 h-5" /> ₹{total}
+              <DollarSign className="w-5 h-5" /> ₹{finalTotal}
             </span>
           </div>
         </div>
 
         {/* Payment Button */}
         <div className="relative w-full p-1 rounded-lg overflow-hidden shining-border">
-          <button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-lg transition-colors shadow-lg text-xl relative z-10">
+          <button onClick={handlePayment} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-lg transition-colors shadow-lg text-xl relative z-10">
             Proceed to Payment
           </button>
         </div>
+
+        {showTicketOptions && (
+          <div className="flex flex-col items-center mt-8">
+            <button onClick={generatePDF} className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg mb-3">Download Ticket (PDF)</button>
+            <button onClick={sharePDF} className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-6 rounded-lg">Share Ticket</button>
+          </div>
+        )}
       </div>
     </div>
   );

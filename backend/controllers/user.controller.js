@@ -44,14 +44,14 @@ const register = asyncHandler(async (req, res) => {
         html : otpFormat(user.username , otp)
     };
 
-   const sent = await mail(content);
-    if(!sent){
-        return res.status(400).send({
-            message : "Problem with sending OTP",
-            success : false
-        })
-    }
-    console.log(otp);
+    // const sent = await mail(content);
+    // if(!sent){
+    //     return res.status(400).send({
+    //         message : "Problem with sending OTP",
+    //         success : false
+    //     })
+    // }
+  
     return res.status(200).send({
         message: "OTP sent to your email",
         success: true
@@ -82,6 +82,7 @@ const verifyOtp = asyncHandler(async (req, res) => {
     await user.save();
 
     return res.status(200).send({
+        user,
         message: "OTP verified. Registration successful",
         success: true
     });

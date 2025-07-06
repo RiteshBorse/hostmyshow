@@ -80,7 +80,7 @@ function EventCard({ _id, title, date, category, location, image, description, p
           <span>{location}</span>
         </div>
         <p className="text-blue-100 mb-4 flex-1 text-center">{description}</p>
-        <Link to={`/events/${_id}`}><button className="mt-auto bg-blue-700 hover:bg-blue-800 text-white font-semibold py-2 rounded-lg transition-colors shadow glow-blue w-full">View Details</button></Link>
+        <Link to={`/events/${_id}`}><button className="mt-auto bg-blue-700 hover:bg-blue-800 px-4 text-white font-semibold py-2 rounded-lg transition-colors shadow glow-blue w-full">View Details</button></Link>
       </div>
     </div>
   );

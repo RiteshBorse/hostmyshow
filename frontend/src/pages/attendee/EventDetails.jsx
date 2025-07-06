@@ -20,7 +20,7 @@ const EventDetails = () => {
   //   duration: "2h 13m",
   //   genre: "Crime, Thriller, Action",
   //   year: 2025,
-  //   poster: "https://m.media-amazon.com/images/I/91dAIcmOjAL._AC_UF1000,1000_QL80_.jpg",
+  //   image: "https://m.media-amazon.com/images/I/91dAIcmOjAL._AC_UF1000,1000_QL80_.jpg",
   //   banner: "https://m.media-amazon.com/images/S/pv-target-images/6f9297a0e0325abbab2384f140597954e79acdcd1dcc3965ed51491457f0235e._SX1080_FMjpg_.jpg",
   //   trailer: "https://www.w3schools.com/html/mov_bbb.mp4" // Sample MP4 for demo
   // };
@@ -66,21 +66,30 @@ const EventDetails = () => {
       <div className="relative z-20 w-full max-w-6xl flex flex-col md:flex-row items-center md:items-start gap-10 px-4 py-16">
         {/* Poster */}
         <img
-          src={event.poster}
+          src={event.image}
           alt={event.title}
-          className="w-1/3 h-1/3 object-cover object-center rounded-2xl shadow-4xl border-b-4 border-b-white flex-shrink-0"
+          className="w-1/3 h-1/3 object-cover object-center rounded-2xl shadow-4xl  border-2 border-amber-500/40 hover:border-purple-500 transition duration-300 flex-shrink-0"
         />
         {/* Details */}
         <div className="flex-1 flex flex-col items-center md:items-start text-center md:text-left">
-          <span className="uppercase text-blue-400 font-semibold tracking-widest mb-2">{event.language}</span>
+          <span className="uppercase text-blue-400 font-semibold tracking-widest mb-2">{event.status}</span>
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-2">{event.title}</h1>
           <div className="flex items-center gap-2 mb-4">
             <span className="text-blue-400 text-lg">★</span>
-            <span className="text-white font-semibold text-lg">{event.userRating}</span>
+            <span className="text-white font-semibold text-lg">{event.special}</span>
           </div>
           <p className="text-blue-100 mb-6 max-w-2xl">{event.description}</p>
           <div className="text-blue-200 font-medium mb-8">
-            {event.duration} • {event.genre} • {event.year}
+          {event.eventDateTime && event.eventDateTime.map((date, index)  => (
+            <span key={index}>
+                {new Date(date).toLocaleString("en-IN", {
+                dateStyle: "long",
+                timeStyle: "short",
+                timeZone: "Asia/Kolkata",
+                })}
+                {index < event.eventDateTime.length - 1 && <>, </>}
+            </span>
+            ))}
           </div>
           <div className="flex gap-4 flex-wrap justify-center md:justify-start">
             <Dialog open={open} onOpenChange={setOpen}>

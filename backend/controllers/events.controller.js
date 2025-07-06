@@ -76,7 +76,7 @@ const getEventSeatsAndTimings = asyncHandler(async (req, res) => {
 const getMyEvents = asyncHandler(async(req , res) => {
   const userId = req.user.id ;
   const events = await Event.find({organizer : userId}).select("-seatMap")
-
+console.log(events)
   if(!events.length)
 {
   return res.status(404).json({
@@ -319,10 +319,14 @@ const getMyBookings = asyncHandler(async(req , res) => {
 })
 
 const getOrganizerSummary = asyncHandler(async (req , res) => {
-  const organizerId =  req.user.id ;
+  const organizerId =  req.user.id;
 
-  const totalBookings =await Booking.countDocuments({ organizer_id: organizerId })
-
+  let events = await Event.find({ organizer : organizerId });
+  let sum = 0;
+  for(let a of events){
+      sum += a.totalBookings;
+  }
+  console.log(sum)
   const bookings = await Booking.find({ organizer_id: organizerId }).select("paymentAmt");
 
   let totalRevenue = 0;
@@ -339,9 +343,10 @@ const getOrganizerSummary = asyncHandler(async (req , res) => {
     success: true,
     message: "Dashboard stats fetched",
     counts: {
-      totalBookings,
+      totalBookings : sum,
       totalRevenue,
-      totalActiveEvents
+      activeShows : totalActiveEvents,
+      totalUsers : 354
     }
   });
 })
@@ -461,7 +466,7 @@ const bookTicket = asyncHandler(async (req, res) => {
     payment_id,
     paymentAmt
   });
-  event.totalBookings = (event.totalBookings || 0) + 1;
+  event.totalBookings = (event.totalBookings || 0) + seatList.length;
   event.totalRevenue = (event.totalRevenue || 0) + Number(paymentAmt);
   await event.save();
 

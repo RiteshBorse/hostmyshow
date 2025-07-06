@@ -9,7 +9,6 @@ const eventSchema = new mongoose.Schema({
   location: String,
   eventType: {
     type: String,
-    enum: ['show', 'hackathon'],
     required: true
   },
   banner: {
@@ -43,7 +42,6 @@ const eventSchema = new mongoose.Schema({
   },
   special: {
     type: String,
-    enum: ['spotlight', 'prime', 'elite', 'special', 'sponsored']
   },
   totalRevenue: {
     type: Number,

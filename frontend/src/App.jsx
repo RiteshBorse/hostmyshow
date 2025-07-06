@@ -19,10 +19,10 @@ import AdminDashboard from './pages/admin/Dashboard'
 import AboutUs from './pages/AboutUs'
 import axios from 'axios'
 import { userStore } from './context/userContext'
+import toast from 'react-hot-toast'
 
 axios.defaults.withCredentials = true;
 
-// Protected Route Component for Organizer
 const ProtectedOrganizerRoute = ({ children }) => {
   const isAuth = userStore((state) => state.isAuth);
   const user = userStore((state) => state.user);
@@ -30,6 +30,7 @@ const ProtectedOrganizerRoute = ({ children }) => {
     return <Navigate to="/login" replace />;
   }
   if (user?.role !== 'Organizer') {
+    toast.error("You have made an Attendee account");
     return <Navigate to="/" replace />;
   }
   return children;

@@ -1,7 +1,7 @@
 import axios from 'axios';
 import React, { useState } from 'react'
 import { useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 
 const Seats = () => {
   const [selectedTiming, setSelectedTiming] = useState('');
@@ -10,6 +10,7 @@ const Seats = () => {
   const [loading, setLoading] = useState(true);
   const [ticketCost, setTicketCost] = useState(0);
   const { id } = useParams();
+  const navigate = useNavigate();
 
   const fetchSeats = async () => {
     try {
@@ -37,6 +38,38 @@ const Seats = () => {
         ? prevSelectedSeats.filter((seat) => seat !== seatId)
         : [...prevSelectedSeats, seatId]
     );
+  };
+
+  // Add useEffect to log data whenever selections change
+  useEffect(() => {
+    const totalAmount = selectedSeats.length * ticketCost;
+    console.log('Selected Seats:', selectedSeats);
+    console.log('Selected Show Time:', selectedTiming);
+    console.log('Total Amount:', totalAmount);
+    console.log('Ticket Cost per seat:', ticketCost);
+  }, [selectedSeats, selectedTiming, ticketCost]);
+
+  const handleProceedToCheckout = () => {
+    const totalAmount = selectedSeats.length * ticketCost;
+    
+    // Log the data being sent to checkout
+    console.log('Data being sent to Checkout:');
+    console.log('Selected Seats:', selectedSeats);
+    console.log('Selected Show Time:', selectedTiming);
+    console.log('Total Amount:', totalAmount);
+    console.log('Event ID:', id);
+    console.log('Event Data:', eventData);
+
+    // Navigate to checkout with state data
+    navigate(`/checkout/${id}`, {
+      state: {
+        selectedSeats,
+        selectedTiming,
+        totalAmount,
+        ticketCost,
+        eventData
+      }
+    });
   };
 
   const renderSeats = () => {
@@ -126,6 +159,7 @@ const Seats = () => {
             <button
               className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg transition-colors shadow-lg text-lg disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={selectedSeats.length === 0}
+              onClick={handleProceedToCheckout}
             >
               Proceed
             </button>

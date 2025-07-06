@@ -11,6 +11,9 @@ import {
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
+import axios from 'axios';
+import toast from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
 
 const eventTypes = ['Hackathon', 'Live Show'];
 const totalSteps = 4;
@@ -24,6 +27,7 @@ const AddEvent = () => {
     type: eventTypes[0],
     times: [''],
     banner: '',
+    image: '',
     certificate: false,
     personalized: false,
     seatMode: 'rows-cols', // or 'direct'
@@ -32,6 +36,7 @@ const AddEvent = () => {
     seats: '',
     cost: '',
   });
+  const navigate = useNavigate();
 
   // Handlers
   const handleChange = (e) => {
@@ -59,11 +64,97 @@ const AddEvent = () => {
 
   const next = () => setStep((s) => s + 1);
   const back = () => setStep((s) => s - 1);
-
-  const handleSubmit = (e) => {
+  
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    alert('Event submitted! (see console for data)');
-    console.log(form);
+
+    // Validation
+    if (!form.title.trim()) {
+      toast.error('Title is required');
+      return;
+    }
+    if (!form.description.trim()) {
+      toast.error('Description is required');
+      return;
+    }
+    if (!form.location.trim()) {
+      toast.error('Location is required');
+      return;
+    }
+    if (!form.banner.trim()) {
+      toast.error('Banner image link is required');
+      return;
+    }
+    if (!form.image.trim()) {
+      toast.error('Image link is required');
+      return;
+    }
+    if (!form.cost || isNaN(form.cost) || Number(form.cost) < 0) {
+      toast.error('Valid ticket cost is required');
+      return;
+    }
+    if (form.times.some(time => !time)) {
+      toast.error('All event timings must be filled');
+      return;
+    }
+    if (form.seatMode === 'rows-cols') {
+      if (!form.rows || isNaN(form.rows) || Number(form.rows) < 1) {
+        toast.error('Valid number of rows is required');
+        return;
+      }
+      if (!form.cols || isNaN(form.cols) || Number(form.cols) < 1) {
+        toast.error('Valid number of columns is required');
+        return;
+      }
+    } else {
+      if (!form.seats || isNaN(form.seats) || Number(form.seats) < 1) {
+        toast.error('Valid number of seats is required');
+        return;
+      }
+    }
+
+    const today = new Date().toISOString().split('T')[0];
+    const eventDateTime = form.times.map(time => new Date(`${today}T${time}`).toISOString());
+
+    let seats, seatMap;
+    if (form.seatMode === 'rows-cols') {
+      seats = {
+        type: 'RowColumns',
+        value: `${form.rows}x${form.cols}`
+      };
+      seatMap = undefined;
+    } else {
+      seats = {
+        type: 'direct'
+      };
+      seatMap = Array.from({ length: Number(form.seats) }, (_, i) => ({
+        seatLabel: `S${i + 1}`,
+        isBooked: false
+      }));
+    }
+
+    const payload = {
+      title: form.title,
+      description: form.description,
+      location: form.location,
+      eventType: form.type,
+      banner: form.banner,
+      image: form.image,
+      eventDateTime,
+      seats,
+      seatMap,
+      cost: Number(form.cost),
+      certificate: form.certificate,
+      special: form.personalized ? 'personalized' : undefined,
+    };
+
+    try {
+      const res = await axios.post(`${import.meta.env.VITE_API}/events/add-events`, payload, { withCredentials: true });
+      toast.success('Event created successfully!');
+      navigate('/organizer/dashboard');
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Failed to create event');
+    }
   };
 
   return (
@@ -106,6 +197,10 @@ const AddEvent = () => {
             <div>
               <label className="block mb-1 font-semibold text-xl">Banner Image Link</label>
               <Input className="h-10 border-white/30" placeholder="e.g https://..." name="banner" value={form.banner} onChange={handleChange} required />
+            </div>
+            <div>
+              <label className="block mb-1 font-semibold text-xl">Image Link</label>
+              <Input className="h-10 border-white/30" placeholder="e.g https://..." name="image" value={form.image} onChange={handleChange} required />
             </div>
             <div className="flex justify-end">
               <Button className="bg-blue-700 hover:bg-blue-800 text-white" onClick={next}>Next</Button>
@@ -177,6 +272,7 @@ const AddEvent = () => {
               <p><span className="font-semibold">Location:</span> {form.location}</p>
               <p><span className="font-semibold">Type:</span> {form.type}</p>
               <p><span className="font-semibold">Banner:</span> {form.banner}</p>
+              <p><span className="font-semibold">Image:</span> {form.image}</p>
               <p><span className="font-semibold">Timings:</span> {form.times.join(', ')}</p>
               <p><span className="font-semibold">Seating:</span> {form.seatMode === 'rows-cols' ? `${form.rows} rows x ${form.cols} columns` : `${form.seats} seats`}</p>
               <p><span className="font-semibold">Ticket Cost:</span> ₹{form.cost}</p>

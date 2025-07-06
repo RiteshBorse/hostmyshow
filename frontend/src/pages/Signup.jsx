@@ -218,13 +218,13 @@ const Signup = () => {
         formData,
         { withCredentials: true }
       );
-      console.log(response.data);
+      toast.success(response.data.message);
       setDialogOpen(true);
       setOtp("");
       setSuccess(false);
       setError("");
     } catch (error) {
-      console.log(error.response.data.message);
+      toast.error(error.response.data.message)
     }
     setIsLoading(false);
   };

@@ -87,7 +87,6 @@ const verifyOtp = asyncHandler(async (req, res) => {
         success: true
     });
 });
-
 const login = asyncHandler(async (req, res) => {
     const { email, password } = req.body;
 

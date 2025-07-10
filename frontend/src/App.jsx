@@ -1,28 +1,29 @@
-import React from 'react'
+import React, { Suspense, lazy } from 'react'
 import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom'
-import Landing from './pages/Landing'
-import Navbar from './components/Navbar'
-import Footer from './components/Footer'
-import Signup from './pages/Signup'
-import Login from './pages/Login'
-import Profile from './pages/Profile'
-import Events from './pages/attendee/Events'
-import EventDetails from './pages/attendee/EventDetails'
-import Seats from './pages/attendee/Seats'
-import MyBookings from './pages/attendee/Bookings'
-import Checkout from './pages/attendee/Checkout'
-import Dashboard from './pages/organizer/Dashboard'
-import DashboardHome from './pages/organizer/DashboardHome'
-import AddEvent from './pages/organizer/AddEvent'
-import ListShows from './pages/organizer/ListShows'
-import ListBookings from './pages/organizer/ListBookings'
-import AdminDashboard from './pages/admin/Dashboard'
-import ShowDetails from './pages/organizer/ShowDetails'
-import EditEvent from './pages/organizer/EditEvent'
-import AboutUs from './pages/AboutUs'
 import axios from 'axios'
 import { userStore } from './context/userContext'
 import toast from 'react-hot-toast'
+
+const Landing = lazy(() => import('./pages/Landing'));
+const Navbar = lazy(() => import('./components/Navbar'));
+const Footer = lazy(() => import('./components/Footer'));
+const Signup = lazy(() => import('./pages/Signup'));
+const Login = lazy(() => import('./pages/Login'));
+const Profile = lazy(() => import('./pages/Profile'));
+const Events = lazy(() => import('./pages/attendee/Events'));
+const EventDetails = lazy(() => import('./pages/attendee/EventDetails'));
+const Seats = lazy(() => import('./pages/attendee/Seats'));
+const MyBookings = lazy(() => import('./pages/attendee/Bookings'));
+const Checkout = lazy(() => import('./pages/attendee/Checkout'));
+const Dashboard = lazy(() => import('./pages/organizer/Dashboard'));
+const DashboardHome = lazy(() => import('./pages/organizer/DashboardHome'));
+const AddEvent = lazy(() => import('./pages/organizer/AddEvent'));
+const ListShows = lazy(() => import('./pages/organizer/ListShows'));
+const ListBookings = lazy(() => import('./pages/organizer/ListBookings'));
+const AdminDashboard = lazy(() => import('./pages/admin/Dashboard'));
+const ShowDetails = lazy(() => import('./pages/organizer/ShowDetails'));
+const EditEvent = lazy(() => import('./pages/organizer/EditEvent'));
+const AboutUs = lazy(() => import('./pages/AboutUs'));
 
 axios.defaults.withCredentials = true;
 
@@ -39,38 +40,54 @@ const ProtectedOrganizerRoute = ({ children }) => {
   return children;
 };
 
+const ProtectedAttendeeRoute = ({ children }) => {
+  const isAuth = userStore((state) => state.isAuth);
+  const user = userStore((state) => state.user);
+  if (!isAuth) {
+    return <Navigate to="/login" replace />;
+  }
+  if (user?.role !== 'Attendee') {
+    toast.error("You have made an Attendee account");
+    return <Navigate to="/" replace />;
+  }
+  return children;
+};
+
+
+const Loader = () => (
+  <div className="min-h-screen flex items-center justify-center bg-transparent">
+    <div className="loader"></div>
+  </div>
+);
+
 const App = () => {
   return (
     <BrowserRouter>
-      <Navbar/>
-      <Routes>
-        <Route path="/" element={<Landing/>}/>
-        <Route path="/sign-up" element={<Signup/>}/>
-        <Route path="/login" element={<Login/>}/>
-        <Route path="/profile" element={<Profile/>}/>
-        <Route path="/about-us" element={<AboutUs/>}/>
-        <Route path="/my-bookings" element={<MyBookings />} />
-        <Route path="/events" element={<Events/>}/>
-        <Route path="/events/:id" element={<EventDetails/>}/>
-        <Route path="/seats/:id" element={<Seats/>}/>
-        <Route path="/checkout/:id" element={<Checkout/>}/>
-
-        <Route path="/organizer" element={
-          <ProtectedOrganizerRoute>
-            <Dashboard />
-          </ProtectedOrganizerRoute>
-        }>
-          <Route path="dashboard" element={<DashboardHome />} />
-          <Route path="add-event" element={<AddEvent />} />
-          <Route path="list-shows" element={<ListShows />} />
-          <Route path="list-bookings" element={<ListBookings />} />
-          <Route path="show/:id" element={<ShowDetails />} />
-          <Route path="edit-event/:id" element={<EditEvent />} />
-        </Route>
-
-        <Route path="/admin" element={<AdminDashboard />} />
-      </Routes>
-      <Footer/>
+      <Suspense fallback={<Loader />}>
+        <Navbar/>
+        <Routes>
+          <Route path="/" element={<Landing/>}/>
+          <Route path="/sign-up" element={<Signup/>}/>
+          <Route path="/login" element={<Login/>}/>
+          <Route path="/profile" element={<Profile/>}/>
+          <Route path="/about-us" element={<AboutUs/>}/>
+          <Route path="/events" element={<Events/>}/>
+          <Route path="/my-bookings" element={<ProtectedAttendeeRoute><MyBookings /></ProtectedAttendeeRoute>} />
+          <Route path="/events/:id" element={<ProtectedAttendeeRoute><EventDetails/></ProtectedAttendeeRoute>} />
+          <Route path="/seats/:id" element={<ProtectedAttendeeRoute><Seats/></ProtectedAttendeeRoute>} />
+          <Route path="/checkout/:id" element={<ProtectedAttendeeRoute><Checkout/></ProtectedAttendeeRoute>} />
+          <Route path="/organizer" element={<ProtectedOrganizerRoute><Dashboard /></ProtectedOrganizerRoute>}>
+            <Route path="dashboard" element={<DashboardHome />} />
+            <Route path="add-event" element={<AddEvent />} />
+            <Route path="list-shows" element={<ListShows />} />
+            <Route path="list-bookings" element={<ListBookings />} />
+            <Route path="show/:id" element={<ShowDetails />} />
+            <Route path="edit-event/:id" element={<EditEvent />} />
+          </Route>
+          <Route path="/admin" element={<AdminDashboard />} />
+        </Routes>
+        <Footer/>
+      </Suspense>
     </BrowserRouter>
   )
 }

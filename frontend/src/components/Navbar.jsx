@@ -35,10 +35,10 @@ const Navbar = () => {
             Events
           </Link>
           <Link
-            to="/favorites"
+            to="/my-bookings"
             className="text-blue-100 hover:text-white transition-colors"
           >
-            Favorites
+            Bookings
           </Link>
           <Link
             to="/about-us"

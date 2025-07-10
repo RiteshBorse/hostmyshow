@@ -383,7 +383,7 @@ const getBookings = asyncHandler(async(req , res) => {
 const getMyBookings = asyncHandler(async(req , res) => {
   const userId = req.user.id ;
   const bookings = await Booking.find({ user_id: userId })
-    .populate("event_id", "title eventDateTime location");
+    .populate("event_id", "title eventDateTime location image eventType");
 
     if (!bookings.length) {
     return res.status(404).json({

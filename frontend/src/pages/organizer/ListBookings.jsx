@@ -1,35 +1,51 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Calendar, Clock, User, Ticket, DollarSign, Search } from 'lucide-react';
+import axios from 'axios';
+import toast from 'react-hot-toast';
 
 const ListBookings = () => {
   const [selectedEvent, setSelectedEvent] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('All'); // 'All', 'Confirmed', 'Pending'
+  const [events, setEvents] = useState([]);
+  const [allBookings, setAllBookings] = useState({});
 
-  // Mock data for events and bookings
-  const events = [
-    { id: '1', title: 'The Accountant²' },
-    { id: '2', title: 'Interstellar' },
-    { id: '3', title: 'Inception' },
-  ];
-
-  const allBookings = {
-    '1': [
-      { id: 'b1', userName: 'Alice Smith', bookingTime: '2025-08-10 10:30 AM', seats: ['A1', 'A2'], total: 700, status: 'Confirmed' },
-      { id: 'b2', userName: 'Bob Johnson', bookingTime: '2025-08-10 11:00 AM', seats: ['B5'], total: 350, status: 'Confirmed' },
-      { id: 'b3', userName: 'Charlie Brown', bookingTime: '2025-08-10 01:00 PM', seats: ['C3', 'C4', 'C5'], total: 1050, status: 'Pending' },
-    ],
-    '2': [
-      { id: 'b4', userName: 'Diana Prince', bookingTime: '2025-08-28 09:00 AM', seats: ['D1', 'D2'], total: 700, status: 'Confirmed' },
-      { id: 'b5', userName: 'Clark Kent', bookingTime: '2025-08-29 02:00 PM', seats: ['E7'], total: 350, status: 'Confirmed' },
-    ],
-    '3': [
-      { id: 'b6', userName: 'Bruce Wayne', bookingTime: '2025-07-18 05:00 PM', seats: ['F1', 'F2', 'F3'], total: 1050, status: 'Confirmed' },
-    ],
-  };
+  useEffect(() => {
+    // Fetch bookings from backend
+    const fetchBookings = async () => {
+      try {
+        const res = await axios.get(`${import.meta.env.VITE_API}/events/get-bookings`, { withCredentials: true });
+        const bookings = res.data.bookings || [];
+        // Group bookings by event_id
+        const bookingsByEvent = {};
+        const eventMap = {};
+        bookings.forEach(booking => {
+          const eventId = booking.event_id?._id || booking.event_id;
+          if (!bookingsByEvent[eventId]) bookingsByEvent[eventId] = [];
+          bookingsByEvent[eventId].push({
+            id: booking._id,
+            userName: booking.user_id?.username || 'Unknown',
+            bookingTime: booking.booking_dateTime,
+            seats: booking.seats.split(','),
+            total: booking.paymentAmt,
+            status: 'Confirmed', // You can update this if you have a status field
+          });
+          // Collect event info
+          if (booking.event_id && booking.event_id.title) {
+            eventMap[eventId] = { id: eventId, title: booking.event_id.title };
+          }
+        });
+        setAllBookings(bookingsByEvent);
+        setEvents(Object.values(eventMap));
+      } catch (error) {
+        toast.error(error.response?.data?.message || 'Failed to fetch bookings');
+      }
+    };
+    fetchBookings();
+  }, []);
 
   const bookingsForSelectedEvent = useMemo(() => {
-    let filteredBookings = selectedEvent ? allBookings[selectedEvent] : [];
+    let filteredBookings = selectedEvent ? allBookings[selectedEvent] || [] : [];
 
     if (searchTerm) {
       filteredBookings = filteredBookings.filter(booking =>
@@ -44,7 +60,7 @@ const ListBookings = () => {
     }
 
     return filteredBookings;
-  }, [selectedEvent, searchTerm, filterStatus]);
+  }, [selectedEvent, searchTerm, filterStatus, allBookings]);
 
   return (
     <div className="min-h-screen p-10 text-white">

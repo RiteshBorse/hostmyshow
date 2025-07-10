@@ -24,8 +24,12 @@ const eventSchema = new mongoose.Schema({
     required: true
   }],
   seats: {
-    type: String,
-    enum: ['RowColumns', 'direct']
+    type: {
+      type: String,
+      enum: ['RowColumns', 'direct'],
+      required: true
+    },
+    value: String
   },
   seatMap: [
   {

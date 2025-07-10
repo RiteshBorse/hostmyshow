@@ -43,6 +43,11 @@ const AboutUs = () => {
             <p className="text-blue-100 mb-1">Final Year Student, Computer Engineering</p>
             <p className="text-blue-100">Passionate about building modern web applications, UI/UX, and solving real-world problems with technology. Always eager to learn and collaborate!</p>
           </div>
+          {/*<div className="bg-blue-900/30 rounded-lg p-4">
+            <p className="text-lg font-bold text-white mb-1">Sakshi Nehe</p>
+            <p className="text-blue-100 mb-1">Final Year Student, Computer Engineering</p>
+            <p className="text-blue-100">Focused on building web applications with strength in backend development, databases, and secure systems. Enjoy turning real-world challenges into scalable solutions and thrive in collaborative, tech-driven environments.</p>
+          </div>*/}
         </section>
       </div>
     </div>

@@ -37,8 +37,8 @@ const BookingCard = ({ booking }) => {
           <span>{event.location}</span>
         </div>
 
-        <div className="text-sm text-blue-100 mb-1">🎟️ Seats: {booking.seats}</div>
-        <div className="text-sm text-blue-100 mb-1">💰 Paid: ₹{booking.paymentAmt}</div>
+        <div className="text-sm text-blue-100 mb-1">Seats: {booking.seats}</div>
+        <div className="text-sm text-blue-100 mb-1">Paid: ₹{booking.paymentAmt}</div>
 
         <div className="text-sm font-semibold px-2 py-1 rounded text-yellow-300">
           Status: {booking.event_status}

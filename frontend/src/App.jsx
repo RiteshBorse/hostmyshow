@@ -9,6 +9,7 @@ import Profile from './pages/Profile'
 import Events from './pages/attendee/Events'
 import EventDetails from './pages/attendee/EventDetails'
 import Seats from './pages/attendee/Seats'
+import MyBookings from './pages/attendee/Bookings'
 import Checkout from './pages/attendee/Checkout'
 import Dashboard from './pages/organizer/Dashboard'
 import DashboardHome from './pages/organizer/DashboardHome'
@@ -48,6 +49,7 @@ const App = () => {
         <Route path="/login" element={<Login/>}/>
         <Route path="/profile" element={<Profile/>}/>
         <Route path="/about-us" element={<AboutUs/>}/>
+        <Route path="/my-bookings" element={<MyBookings />} />
         <Route path="/events" element={<Events/>}/>
         <Route path="/events/:id" element={<EventDetails/>}/>
         <Route path="/seats/:id" element={<Seats/>}/>

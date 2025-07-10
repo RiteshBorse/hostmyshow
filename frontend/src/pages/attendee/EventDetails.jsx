@@ -68,7 +68,7 @@ const EventDetails = () => {
         <img
           src={event.image}
           alt={event.title}
-          className="w-1/3 h-1/3 object-cover object-center rounded-2xl shadow-4xl  border-2 border-amber-500/40 hover:border-purple-500 transition duration-300 flex-shrink-0"
+          className="w-1/2 h-1/3 object-cover object-center rounded-2xl shadow-4xl  border-2 border-amber-500/40 hover:border-purple-500 transition duration-300 flex-shrink-0"
         />
         {/* Details */}
         <div className="flex-1 flex flex-col items-center md:items-start text-center md:text-left">

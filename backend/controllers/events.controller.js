@@ -558,5 +558,4 @@ const bookTicket = asyncHandler(async (req, res) => {
   });
 });
 
-
 export { getEvents, getEventById, postEvent, getEventSeatsAndTimings , getMyEvents , getMyEventById , updateMyEvent , deleteMyEvent , getBookings , getMyBookings , getOrganizerSummary ,  bookTicket , checkSeatsAvailability};

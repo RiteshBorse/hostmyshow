@@ -471,9 +471,6 @@ const checkSeatsAvailability = asyncHandler(async (req, res) => {
   });
 });
   
-
-
-
 const generateTicketQR = async (data) => {
   const qrContent = JSON.stringify(data);
   return await QRCode.toDataURL(qrContent); // base64 image
@@ -558,4 +555,6 @@ const bookTicket = asyncHandler(async (req, res) => {
   });
 });
 
-export { getEvents, getEventById, postEvent, getEventSeatsAndTimings , getMyEvents , getMyEventById , updateMyEvent , deleteMyEvent , getBookings , getMyBookings , getOrganizerSummary ,  bookTicket , checkSeatsAvailability};
+
+
+export { getEvents, getEventById, postEvent, getEventSeatsAndTimings , getMyEvents , getMyEventById , updateMyEvent , deleteMyEvent , getBookings , getMyBookings , getOrganizerSummary ,  bookTicket , checkSeatsAvailability };

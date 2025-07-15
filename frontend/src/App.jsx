@@ -24,6 +24,7 @@ const AdminDashboard = lazy(() => import('./pages/admin/Dashboard'));
 const ShowDetails = lazy(() => import('./pages/organizer/ShowDetails'));
 const EditEvent = lazy(() => import('./pages/organizer/EditEvent'));
 const AboutUs = lazy(() => import('./pages/AboutUs'));
+const ChatBot = lazy(() => import('./pages/ChatBot'));
 
 axios.defaults.withCredentials = true;
 
@@ -86,6 +87,7 @@ const App = () => {
           </Route>
           <Route path="/admin" element={<AdminDashboard />} />
         </Routes>
+        <ChatBot />
         <Footer/>
       </Suspense>
     </BrowserRouter>

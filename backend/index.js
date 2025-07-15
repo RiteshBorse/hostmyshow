@@ -3,14 +3,10 @@ import dotenv from "dotenv"
 import cors from "cors"
 import { connectDB } from "./utils/connectDB.js";
 import cookieParser from "cookie-parser";
+
+//Express Setup 
 dotenv.configDotenv();
 const app = express();
-
-import Razorpay from "razorpay"
-export const razorpayInstance = new Razorpay({
-    key_id : process.env.RAZORPAY_KEY,
-    key_secret : process.env.RAZORPAY_KEY_SECRET
-})
 app.use(express.json());
 app.use(cors({
     origin : process.env.CLIENT_URL,
@@ -18,6 +14,23 @@ app.use(cors({
 }));
 app.use(cookieParser());
 
+//Razorpay Setup 
+import Razorpay from "razorpay"
+export const razorpayInstance = new Razorpay({
+    key_id : process.env.RAZORPAY_KEY,
+    key_secret : process.env.RAZORPAY_KEY_SECRET
+})
+
+//Gemini Setup
+import { GoogleGenerativeAI } from "@google/generative-ai";
+import { geminiTools } from "./services/gemini/tools.js";
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+export const model = genAI.getGenerativeModel({
+    model : "gemini-1.5-flash",
+    tools : geminiTools
+})
+
+//Routes Setup
 import userRouter from "./routes/user.routes.js"
 app.use("/api/user" , userRouter);
 
@@ -27,6 +40,7 @@ app.use("/api/events" , eventsRouter);
 import paymentRouter from "./routes/payment.routes.js"
 app.use("/api/payment" , paymentRouter)
 
+//Server
 app.listen(process.env.PORT || 8000 , ()=> {
     connectDB();
     console.log(`Server listening on ${process.env.PORT || 8000}`)

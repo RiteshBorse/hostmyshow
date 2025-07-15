@@ -51,7 +51,7 @@ const Navbar = () => {
               <Button
                 variant="outline"
                 size="lg"
-                className="border-blue-400/30 text-blue-100 bg-transparent"
+                className="border-blue-400/30 text-white bg-transparent hover:border-white hover:text-white hover:bg-transparent"
               >
                 Sign In
               </Button>

@@ -47,7 +47,7 @@ const ProtectedAttendeeRoute = ({ children }) => {
     return <Navigate to="/login" replace />;
   }
   if (user?.role !== 'Attendee') {
-    toast.error("You have made an Attendee account");
+    toast.error("You have made an Organizer account");
     return <Navigate to="/" replace />;
   }
   return children;
@@ -73,8 +73,8 @@ const App = () => {
           <Route path="/about-us" element={<AboutUs/>}/>
           <Route path="/events" element={<Events/>}/>
           <Route path="/my-bookings" element={<ProtectedAttendeeRoute><MyBookings /></ProtectedAttendeeRoute>} />
-          <Route path="/events/:id" element={<ProtectedAttendeeRoute><EventDetails/></ProtectedAttendeeRoute>} />
-          <Route path="/seats/:id" element={<ProtectedAttendeeRoute><Seats/></ProtectedAttendeeRoute>} />
+          <Route path="/events/:id" element={<EventDetails/>} />
+          <Route path="/seats/:id" element={<Seats/>} />
           <Route path="/checkout/:id" element={<ProtectedAttendeeRoute><Checkout/></ProtectedAttendeeRoute>} />
           <Route path="/organizer" element={<ProtectedOrganizerRoute><Dashboard /></ProtectedOrganizerRoute>}>
             <Route path="dashboard" element={<DashboardHome />} />

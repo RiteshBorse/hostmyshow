@@ -70,7 +70,7 @@ function EventCard({ _id, title, date, category, location, image, description, p
       {plate && plateStyles[plate] && (
         <div className={plateStyles[plate].className}>{plateStyles[plate].label}</div>
       )}
-      <img src={image} alt={title} className="w-3/4 h-2/3 object-cover object-center rounded-lg mt-6 shadow-lg border-1 bg-white" />
+      <img src={image} alt={title} className="w-[90%] h-2/3 object-cover object-center rounded-lg mt-6 shadow-lg  bg-white" />
       <div className="p-6 flex flex-col flex-1 w-full items-center">
         <h3 className="text-xl font-bold text-white mb-2 text-center">{title}</h3>
         <div className="flex flex-wrap items-center gap-2 text-blue-200 text-sm mb-2 justify-center">
@@ -198,7 +198,7 @@ const Events = () => {
               id="category"
               value={filter}
               onChange={e => setFilter(e.target.value)}
-              className="h-12 text-white placeholder:text-white/60 border-1 rounded-md border-white/40"
+              className="px-2 h-12 text-white placeholder:text-white/60 border-1 rounded-md border-white/40"
             >
               {categories.map(cat => (
                 <option key={cat} value={cat}>{cat}</option>
@@ -211,7 +211,7 @@ const Events = () => {
               id="dateFilter"
               value={dateFilter}
               onChange={e => setDateFilter(e.target.value)}
-              className="h-12 text-white placeholder:text-white/60 border-1 rounded-md border-white/40"
+              className="h-12 px-2 text-white placeholder:text-white/60 border-1 rounded-md border-white/40"
             >
               {dateFilters.map(df => (
                 <option key={df} value={df}>{df}</option>
@@ -224,7 +224,7 @@ const Events = () => {
               id="specialFilter"
               value={specialFilter}
               onChange={e => setSpecialFilter(e.target.value)}
-              className="h-12 text-white placeholder:text-white/60 border-1 rounded-md border-white/40"
+              className="h-12 px-2 text-white placeholder:text-white/60 border-1 rounded-md border-white/40"
             >
               {specialFilters.map(sf => (
                 <option key={sf} value={sf}>{sf}</option>

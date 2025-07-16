@@ -40,7 +40,9 @@ app.use("/api/events" , eventsRouter);
 import paymentRouter from "./routes/payment.routes.js"
 app.use("/api/payment" , paymentRouter)
 
-//Server
+import reviewRouter from "./routes/reveiw.route.js"
+app.use("/api/reviews" , reviewRouter);
+
 app.listen(process.env.PORT || 8000 , ()=> {
     connectDB();
     console.log(`Server listening on ${process.env.PORT || 8000}`)

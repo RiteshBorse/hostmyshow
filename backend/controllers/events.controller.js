@@ -4,6 +4,7 @@ import { User } from "../models/user.model.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import QRCode from 'qrcode';
 import { areArraysEqual } from "../utils/arrayUtils.js";
+import { confirmationFormat, mail } from "../utils/email.js";
 
 const getEvents = asyncHandler(async (req, res) => {
   let events = await Event.find({}).select(
@@ -418,6 +419,8 @@ const bookTicket = asyncHandler(async (req, res) => {
     });
   }
 
+  console.log(event)
+
   const seatList = seats.split(',').map(s => s.trim());
 
   const invalidSeats = [];
@@ -441,11 +444,7 @@ const bookTicket = asyncHandler(async (req, res) => {
   // Save updated seat status
   event.seatMap = updatedSeatMap;
   await event.save();
-
-  // Get event organizer
   const organizer_id = event.organizer;
-
-  // Generate QR code
   const qrCodeData = {
     event: event_id,
     user: user_id,
@@ -454,8 +453,6 @@ const bookTicket = asyncHandler(async (req, res) => {
     payment: payment_id
   };
   const qrCode = await generateTicketQR(qrCodeData);
-
-  // Create booking
   const booking = await Booking.create({
     user_id,
     event_id,
@@ -476,6 +473,40 @@ const bookTicket = asyncHandler(async (req, res) => {
     message: 'Booking successful!',
     booking
   });
+const base64Data = booking.ticket_qr.split(',')[1]; 
+
+const htmlContent = confirmationFormat(
+  event.title,
+  booking.booking_dateTime,
+  booking.seats,
+  req.user.email,
+  booking.ticket_qr, 
+  booking.payment_id,
+  booking.paymentAmt
+);
+
+const finalHtml = htmlContent.replace(
+  "{{TICKET_QR}}",
+  `<img src="cid:ticketqr" alt="Ticket QR" style="width: 200px;" />`
+);
+
+
+const content = {
+  to: req.user.email,
+  subject: "Confirmation of Ticket",
+  html: finalHtml,
+  attachments: [
+    {
+      filename: "ticketqr.png",
+      content: base64Data,
+      encoding: "base64",
+      cid: "ticketqr", 
+    },
+  ],
+};
+
+// Send the email
+await mail(content);
 });
 
 

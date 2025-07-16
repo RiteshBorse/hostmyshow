@@ -63,7 +63,7 @@ const ListBookings = () => {
   }, [selectedEvent, searchTerm, filterStatus, allBookings]);
 
   return (
-    <div className="min-h-screen p-10 text-white">
+    <div className="min-h-screen px-10 text-white">
       <h1 className="text-4xl font-bold mb-8 text-center text-blue-300">Manage Bookings</h1>
 
       <div className="mb-8 flex flex-col md:flex-row items-center justify-center gap-4">

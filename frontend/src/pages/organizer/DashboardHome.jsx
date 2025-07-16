@@ -5,42 +5,9 @@ import { useState } from 'react';
 import { useEffect } from 'react';
 
 const DashboardHome = () => {
-  // Mock data for demonstration
-  const dummyEvents = [
-    {
-      id: 1,
-      title: "The Accountant²",
-      date: "2025-08-12",
-      time: "7:30 PM",
-      location: "PVR Cinemas, Downtown",
-      banner: "https://m.media-amazon.com/images/I/91dAIcmOjAL._AC_UF1000,1000_QL80_.jpg",
-      totalBookings: 250,
-      totalRevenue: 87500,
-    },
-    {
-      id: 2,
-      title: "Interstellar",
-      date: "2025-09-01",
-      time: "8:00 PM",
-      location: "Cineplex, City Center",
-      banner: "https://m.media-amazon.com/images/I/91obuWc3ZzL._AC_UF1000,1000_QL80_.jpg",
-      totalBookings: 300,
-      totalRevenue: 105000,
-    },
-    {
-      id: 3,
-      title: "Inception",
-      date: "2025-09-15",
-      time: "6:00 PM",
-      location: "Grand Cinema, West End",
-      banner: "https://m.media-amazon.com/images/I/81o-F1z2+wL._AC_UF1000,1000_QL80_.jpg",
-      totalBookings: 180,
-      totalRevenue: 63000,
-    },
-  ];
 
   const [stats, setstats] = useState({})
-  const [events, setevents] = useState(dummyEvents);
+  const [events, setevents] = useState([]);
   const fetchStats = async () => {
     try {
       const res = await axios.get(`${import.meta.env.VITE_API}/events/getOrganizerSummary`);
@@ -52,7 +19,7 @@ const DashboardHome = () => {
   const fetchEvents = async () => {
     try {
       const res = await axios.get(`${import.meta.env.VITE_API}/events/get-my-events`);
-      setevents(res.data.events || dummy )
+      setevents(res.data.events)
       console.log(res.data.events)
     } catch (error) {
       console.log(error.res.data.message)
@@ -62,12 +29,6 @@ const DashboardHome = () => {
     fetchStats();
     fetchEvents();
   },[])
-  const dummy = {
-    totalBookings: 1250,
-    totalRevenue: 750000,
-    activeShows: 15,
-    totalUsers: 5000,
-  };
 
 
   return (

@@ -212,113 +212,39 @@ const postEvent = asyncHandler(async (req, res) => {
   });
 });
 
-const updateMyEvent = asyncHandler(async(req , res) => {
-  const {id} =  req.params ;
-  const userId = req.user.id ;
+const updateMyEvent = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const userId = req.user.id;
 
-  const event = await Event.findOne({_id : id , organizer : userId });
+  const event = await Event.findOne({ _id: id, organizer: userId });
 
-  if(!event) {
+  if (!event) {
     return res.status(404).json({
-      success  : false ,
-      message : "Event Not Found"
-    })
+      success: false,
+      message: "Event Not Found or you're not authorized to edit it."
+    });
   }
 
-  const { seats: newSeats, seatMap: newDirectSeatMap, ...restOfUpdatedData } = req.body;
-
-  // Check if seat configuration is changing
-  // It's crucial to compare against the *current* state of event.seats and event.seatMap
-  const isSeatConfigChanging =
-    (newSeats?.type && newSeats.type !== event.seats.type) ||
-    (newSeats?.type === 'RowColumns' && newSeats.value !== event.seats.value) ||
-    (newSeats?.type === 'direct' && newDirectSeatMap && !areArraysEqual(newDirectSeatMap, event.seatMap));
-
-  let finalSeatMap = event.seatMap; // Default to existing map
-  let finalSeatsObject = event.seats; // Default to existing seats object
-
-  if (isSeatConfigChanging) {
-    const existingBookings = await Booking.find({ event_id: id });
-    if (existingBookings.length > 0) {
-      return res.status(400).json({
-        success: false,
-        message: "Cannot change seating configuration: bookings already exist for this event.",
-      });
-    }
-
-    // Regenerate seatMap based on new configuration
-    if (newSeats.type === "RowColumns") {
-      const [rows, cols] = newSeats.value.split("x").map(Number);
-      if (isNaN(rows) || isNaN(cols) || rows < 1 || cols < 1) {
-        return res.status(400).json({ success: false, message: "Invalid RowColumns format for seating." });
-      }
-      finalSeatMap = [];
-      for (let r = 0; r < rows; r++) {
-        const rowLabel = String.fromCharCode(65 + r);
-        for (let c = 1; c <= cols; c++) {
-          finalSeatMap.push({ seatLabel: `${rowLabel}${c}`, isBooked: false });
-        }
-      }
-    } else if (newSeats.type === "direct") {
-      if (!Array.isArray(newDirectSeatMap) || newDirectSeatMap.length === 0) {
-        return res.status(400).json({ success: false, message: "Seat map is required for direct seat type." });
-      }
-      // Ensure new seats are not booked by default if the map is provided directly
-      finalSeatMap = newDirectSeatMap.map(seat => ({ ...seat, isBooked: false }));
-    } else {
-        return res.status(400).json({ success: false, message: "Invalid seats.type. Must be 'RowColumns' or 'direct'." });
-    }
-    finalSeatsObject = newSeats; // Use the new seats object
-  } else {
-    if (newSeats) {
-        finalSeatsObject = newSeats;
-    }
-  }
-
-  // Debugging: Log finalSeatMap before update
-  console.log("Final Seat Map before update:", finalSeatMap);
-  console.log("Final Seat Map length:", finalSeatMap.length);
-
-  // Construct a single update document for all fields EXCEPT seatMap
-  let updateDoc = {
-    ...restOfUpdatedData,
-  };
-
-  if (isSeatConfigChanging) {
-    updateDoc.seats = finalSeatsObject;
-  } else {
-    if (newSeats) {
-        updateDoc.seats = newSeats;
-    }
-  }
+  const updateData = { ...req.body };
 
   const updatedEvent = await Event.findByIdAndUpdate(
     id,
-    { $set: updateDoc },
-    { new: true, runValidators: true }
+    { $set: updateData },
+    { new: true}
   );
 
   if (!updatedEvent) {
-    return res.status(404).json({ success: false, message: "Event not found after update attempt." });
-  }
-
-  // If seat configuration changed, perform separate operations to unset and then set seatMap
-  // This is a workaround to avoid potential Mongoose recursion issues with array replacement.
-  if (isSeatConfigChanging) {
-    // 1. Unset (remove) the existing seatMap field
-    await Event.updateOne({ _id: id }, { $unset: { seatMap: "" } });
-    // 2. Set (add) the new seatMap array
-    await Event.updateOne({ _id: id }, { $set: { seatMap: finalSeatMap } });
-    
-    // Refresh the updatedEvent object to include the latest seatMap
-    updatedEvent.seatMap = finalSeatMap;
+    return res.status(404).json({
+      success: false,
+      message: "Event could not be updated."
+    });
   }
 
   return res.status(200).json({
-    success : true ,
-    event  : updatedEvent ,
-    message : "Event Updated Successfully"
-  })
+    success: true,
+    event: updatedEvent,
+    message: "Event Updated Successfully"
+  });
 });
 
 const deleteMyEvent = asyncHandler(async (req, res) => {

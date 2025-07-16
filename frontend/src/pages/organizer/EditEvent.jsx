@@ -34,10 +34,6 @@ const EditEvent = () => {
     image: '',
     certificate: false,
     personalized: false,
-    seatMode: 'rows-cols', // or 'direct'
-    rows: '',
-    cols: '',
-    seats: '',
     cost: '',
   });
   const [loading, setLoading] = useState(true);
@@ -61,10 +57,6 @@ const EditEvent = () => {
             image: eventData.image || '',
             certificate: eventData.certificate || false,
             personalized: eventData.special === 'personalized',
-            seatMode: eventData.seats === 'RowColumns' ? 'rows-cols' : 'direct',
-            rows: eventData.seats === 'RowColumns' && eventData.seatMap.length > 0 ? Math.floor(eventData.seatMap.length / (eventData.seatMap[0].seatLabel.match(/\d+/)?.[0] || 1)) : '',
-            cols: eventData.seats === 'RowColumns' && eventData.seatMap.length > 0 ? (eventData.seatMap[0].seatLabel.match(/\d+/)?.[0] || 1) : '',
-            seats: eventData.seats === 'direct' ? eventData.seatMap.length : '',
             cost: eventData.cost,
           });
         }
@@ -141,21 +133,7 @@ const EditEvent = () => {
       toast.error('All event timings must be filled');
       return;
     }
-    if (form.seatMode === 'rows-cols') {
-      if (!form.rows || isNaN(form.rows) || Number(form.rows) < 1) {
-        toast.error('Valid number of rows is required');
-        return;
-      }
-      if (!form.cols || isNaN(form.cols) || Number(form.cols) < 1) {
-        toast.error('Valid number of columns is required');
-        return;
-      }
-    } else {
-      if (!form.seats || isNaN(form.seats) || Number(form.seats) < 1) {
-        toast.error('Valid number of seats is required');
-        return;
-      }
-    }
+    
 
     // Combine date and times into eventDateTime array
     const eventDateTime = form.times.map(time => {
@@ -163,22 +141,6 @@ const EditEvent = () => {
       return new Date(dateTimeString).toISOString();
     });
 
-    let seats, seatMap;
-    if (form.seatMode === 'rows-cols') {
-      seats = {
-        type: 'RowColumns',
-        value: `${form.rows}x${form.cols}`
-      };
-      seatMap = undefined; // Will be generated in backend
-    } else {
-      seats = {
-        type: 'direct'
-      };
-      seatMap = Array.from({ length: Number(form.seats) }, (_, i) => ({
-        seatLabel: `S${i + 1}`,
-        isBooked: false
-      }));
-    }
 
     const payload = {
       title: form.title,
@@ -188,8 +150,6 @@ const EditEvent = () => {
       banner: form.banner,
       image: form.image,
       eventDateTime,
-      seats,
-      seatMap,
       cost: Number(form.cost),
       certificate: form.certificate,
       special: form.personalized ? 'personalized' : undefined,
@@ -215,9 +175,38 @@ const EditEvent = () => {
   return (
     <div className="p-10 text-white w-[80vw] max-w-5xl mx-auto">
       <h1 className="text-3xl font-bold mb-6">Edit Event</h1>
-      {/* Progress Bar */}
+      {/* Improved Progress Bar with Step Indicators */}
       <div className="mb-8">
-        <Progress value={(step / totalSteps) * 100} className="h-3 text-blue-500 bg-blue-900" />
+        {/* Step Indicators */}
+        <div className="flex items-center justify-between mb-4">
+          {[
+            { label: 'Basic Info', step: 1 },
+            { label: 'Schedule & Seats', step: 2 },
+            { label: 'Options', step: 3 },
+            { label: 'Review', step: 4 },
+          ].map(({ label, step: s }, idx, arr) => (
+            <React.Fragment key={label}>
+              <div className="flex flex-col items-center flex-1 min-w-0">
+                <div
+                  className={`w-8 h-8 flex items-center justify-center rounded-full border-2 transition-all duration-300
+                    ${step === s ? 'bg-blue-600 border-blue-400 text-white shadow-lg' : step > s ? 'bg-blue-400 border-blue-400 text-white' : 'bg-gray-800 border-blue-900 text-blue-300'}`}
+                  aria-current={step === s ? 'step' : undefined}
+                >
+                  {step > s ? (
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+                  ) : (
+                    s
+                  )}
+                </div>
+                <span className={`mt-2 text-xs font-semibold text-center truncate ${step === s ? 'text-blue-300' : 'text-blue-200/60'}`}>{label}</span>
+              </div>
+              {idx < arr.length - 1 && (
+                <div className={`flex-1 h-1 mx-1 ${step > s ? 'bg-blue-400' : 'bg-blue-900'} transition-all duration-300 rounded-full`} />
+              )}
+            </React.Fragment>
+          ))}
+        </div>
+        {/* Progress Bar */}
         <div className="text-blue-300 text-sm mt-2 text-right">Step {step} of {totalSteps}</div>
       </div>
       <form onSubmit={handleSubmit} className="space-y-8 w-full">
@@ -277,23 +266,28 @@ const EditEvent = () => {
               </div>
             ))}
             <Button type="button" variant="secondary" className="bg-blue-700 hover:bg-blue-800 text-white" onClick={addTime}>Add Time</Button>
-            <label className="block mb-1 font-semibold text-xl mt-4">Seating Arrangement</label>
+
+            {/* --- MODIFICATION START: Hiding Seating Arrangement --- */}
+            {/* <label className="block mb-1 font-semibold text-xl mt-4">Seating Arrangement</label>
             <div className="flex gap-4 mb-2">
               <label className="flex items-center gap-2">
-                <Input type="radio" name="seatMode" value="rows-cols" checked={form.seatMode === 'rows-cols'} onChange={handleChange} /> Rows & Columns
+                <Input type="radio" name="seatMode" value="rows-cols" checked={form.seatMode === 'rows-cols'} disabled /> Rows & Columns
               </label>
               <label className="flex items-center gap-2">
-                <Input type="radio" name="seatMode" value="direct" checked={form.seatMode === 'direct'} onChange={handleChange} /> Direct Seat Count
+                <Input type="radio" name="seatMode" value="direct" checked={form.seatMode === 'direct'} disabled /> Direct Seat Count
               </label>
             </div>
             {form.seatMode === 'rows-cols' ? (
               <div className="flex gap-4">
-                <Input name="rows" className="h-10 border-white/30" value={form.rows} onChange={handleChange} type="number" min="1" placeholder="Rows" required />
-                <Input name="cols" className="h-10 border-white/30" value={form.cols} onChange={handleChange} type="number" min="1" placeholder="Columns" required />
+                <Input name="rows" className="h-10 border-white/30" value={form.rows} type="number" min="1" placeholder="Rows" readOnly />
+                <Input name="cols" className="h-10 border-white/30" value={form.cols} type="number" min="1" placeholder="Columns" readOnly />
               </div>
             ) : (
-              <Input name="seats" className="h-10 border-white/30" value={form.seats} onChange={handleChange} type="number" min="1" placeholder="Total Seats" required />
+              <Input name="seats" className="h-10 border-white/30" value={form.seats} type="number" min="1" placeholder="Total Seats" readOnly />
             )}
+            */}
+            {/* --- MODIFICATION END --- */}
+
             <label className="block mb-1 font-semibold text-xl mt-4">Cost of Ticket (₹)</label>
             <Input className="h-10 border-white/30" placeholder="e.g 500" name="cost" value={form.cost} onChange={handleChange} type="number" min="0" required />
             <div className="flex justify-between">
@@ -331,7 +325,11 @@ const EditEvent = () => {
               <p><span className="font-semibold">Banner:</span> {form.banner}</p>
               <p><span className="font-semibold">Image:</span> {form.image}</p>
               <p><span className="font-semibold">Timings:</span> {form.times.join(', ')}</p>
-              <p><span className="font-semibold">Seating:</span> {form.seatMode === 'rows-cols' ? `${form.rows} rows x ${form.cols} columns` : `${form.seats} seats`}</p>
+              
+              {/* --- MODIFICATION START: Hiding Seating Info --- */}
+              {/* <p><span className="font-semibold">Seating:</span> {form.seatMode === 'rows-cols' ? `${form.rows} rows x ${form.cols} columns` : `${form.seats} seats`}</p> */}
+              {/* --- MODIFICATION END --- */}
+
               <p><span className="font-semibold">Ticket Cost:</span> ₹{form.cost}</p>
               <p><span className="font-semibold">Certificate:</span> {form.certificate ? 'Yes' : 'No'}</p>
               <p><span className="font-semibold">Personalized Website:</span> {form.personalized ? 'Yes' : 'No'}</p>
@@ -347,4 +345,4 @@ const EditEvent = () => {
   );
 };
 
-export default EditEvent; 
+export default EditEvent;

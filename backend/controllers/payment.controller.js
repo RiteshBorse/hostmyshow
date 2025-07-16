@@ -40,8 +40,6 @@ const verifyPayment = asyncHandler(async (req , res) => {
             .update(sign.toString())
             .digest("hex");
 
-        // console.log(razorpay_signature === expectedSign);
-
         // Create isAuthentic
         const isAuthentic = expectedSign === razorpay_signature;
 

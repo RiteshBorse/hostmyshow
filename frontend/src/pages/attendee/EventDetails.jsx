@@ -5,25 +5,12 @@ import { useRef } from 'react';
 import { useEffect } from 'react';
 import axios from 'axios';
 import { Link, useParams } from 'react-router-dom';
+import { userStore } from '@/context/userContext';
 
 const EventDetails = () => {
   // Example event/movie data
   const [event , setEvent] = useState({});
   const {id} = useParams();
-  // const event = {
-  //   title: "The Accountant²",
-  //   language: "ENGLISH",
-  //   rating: 7.1,
-  //   userRating: "7.1 User Rating",
-  //   description:
-  //     "When an old acquaintance is murdered, Wolff is compelled to solve the case. Realizing more extreme measures are necessary, Wolff recruits his estranged and highly lethal brother, Brax, to help. In partnership with Marybeth Medina, they uncover a deadly conspiracy, becoming targets of a ruthless network of killers who will stop at nothing to keep their secrets buried.",
-  //   duration: "2h 13m",
-  //   genre: "Crime, Thriller, Action",
-  //   year: 2025,
-  //   image: "https://m.media-amazon.com/images/I/91dAIcmOjAL._AC_UF1000,1000_QL80_.jpg",
-  //   banner: "https://m.media-amazon.com/images/S/pv-target-images/6f9297a0e0325abbab2384f140597954e79acdcd1dcc3965ed51491457f0235e._SX1080_FMjpg_.jpg",
-  //   trailer: "https://www.w3schools.com/html/mov_bbb.mp4" // Sample MP4 for demo
-  // };
   const fetchEvent = async () => {
     console.log(id);
     try {
@@ -38,9 +25,52 @@ const EventDetails = () => {
   const [open, setOpen] = useState(false);
   const videoRef = useRef(null);
 
+  const [reviews, setReviews] = useState([]);
+const [newReview, setNewReview] = useState('');
+const [loadingReviews, setLoadingReviews] = useState(false);
+
+// Replace this with real user ID (from auth)
+const user = userStore((state) => state.user);
+console.log(user)
+
+// Fetch reviews
+const fetchReviews = async () => {
+  try {
+    setLoadingReviews(true);
+    const res = await axios.get(`${import.meta.env.VITE_API}/review/getreviews/${id}`);
+    const positiveReviews = res.data.data.positive || [];
+    const neutralReviews = res.data.data.neutral || [];
+    const negativeReviews = res.data.data.negative || [];
+    setReviews(positiveReviews || neutralReviews || negativeReviews);
+  } catch (err) {
+    console.error("Error fetching reviews", err);
+  } finally {
+    setLoadingReviews(false);
+  }
+};
+
+// Submit review
+const submitReview = async () => {
+  if (!newReview.trim()) return;
+
+  try {
+    await axios.post(`${import.meta.env.VITE_API}/review/addreview`, {
+      user_id: user.id,
+      event_id: id,
+      review: newReview,
+    });
+    setNewReview('');
+    fetchReviews(); // refresh list
+  } catch (err) {
+    console.error("Error submitting review", err);
+  }
+};
+
+
   // Reset video when dialog closes
   useEffect(()=> {
     fetchEvent();
+    fetchReviews();
   },[])
   useEffect(() => {
     if (!open && videoRef.current) {
@@ -49,7 +79,7 @@ const EventDetails = () => {
   }, [open]);
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center overflow-hidden">
+    <div className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden">
       {/* Banner background */}
       <div
         className="absolute inset-0 z-0 bg-black/90"
@@ -60,15 +90,14 @@ const EventDetails = () => {
           filter: 'blur(4px) brightness(1)',
         }}
       />
-      {/* Overlay for dark effect */}
       <div className="absolute inset-0 bg-black/70 z-10" />
       {/* Main content */}
-      <div className="relative z-20 w-full max-w-6xl flex flex-col md:flex-row items-center md:items-start gap-10 px-4 py-16">
+      <div className="my-14 relative z-20 w-full max-w-6xl flex flex-col md:flex-row items-center md:items-start gap-10 px-4 py-16">
         {/* Poster */}
         <img
           src={event.image}
           alt={event.title}
-          className="w-1/2 h-1/3 object-cover object-center rounded-2xl shadow-4xl  border-2 border-amber-500/40 hover:border-purple-500 transition duration-300 flex-shrink-0"
+          className="h-2/3 w-1/2 object-cover object-center rounded-2xl shadow-4xl  border-2 border-amber-500/40 transition-all duration-300 flex-shrink-0"
         />
         {/* Details */}
         <div className="flex-1 flex flex-col items-center md:items-start text-center md:text-left">
@@ -118,6 +147,47 @@ const EventDetails = () => {
           </div>
         </div>
       </div>
+      {/* Reviews Section */}
+      <div className="relative z-20 w-full max-w-4xl mx-auto px-4 py-8">
+        <h2 className="text-2xl font-bold text-white mb-4">Reviews</h2>
+
+        {/* Add New Review */}
+        <div className="bg-white/5 p-4 rounded-lg border border-white/10 mb-6">
+          <textarea
+            value={newReview}
+            onChange={(e) => setNewReview(e.target.value)}
+            placeholder="Add a public comment..."
+            className="w-full p-3 bg-black/30 text-white rounded-lg border border-white/20 focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none"
+            rows={3}
+          />
+          <div className="flex justify-end mt-2">
+            <button
+              onClick={submitReview}
+              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-lg shadow transition-all"
+            >
+              Post
+            </button>
+          </div>
+          <div className="space-y-4 max-h-[300px] mt-4 overflow-y-auto pr-2">
+          {loadingReviews ? (
+            <p className="text-blue-300">Loading reviews...</p>
+          ) : reviews.length === 0 ? (
+            <p className="text-blue-300">No reviews yet. Be the first to add one!</p>
+          ) : (
+            reviews.map((review, index) => (
+              <div key={index} className="bg-white/5 p-3 rounded-lg border border-white/10">
+                <span className="text-lg text-blue-400 mt-1 block">{user.username}</span>
+                <p className="text-blue-100 text-sm mt-1">{review.review}</p>
+              </div>
+            ))
+          )}
+        </div>
+        </div>
+
+        {/* Review List */}
+        
+      </div>
+
     </div>
   )
 }

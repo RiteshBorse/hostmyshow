@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Calendar, MapPin, Ticket, DollarSign } from 'lucide-react'
 import { useState } from 'react';
 import axios from 'axios';
@@ -10,7 +10,7 @@ import 'jspdf-autotable';
 const Checkout = () => {
   const { id } = useParams();
   const location = useLocation();
-  
+  const [event, setEvent] = useState({})
   // Get data passed from Seats page
   const {
     selectedSeats = [],
@@ -21,17 +21,13 @@ const Checkout = () => {
   } = location.state || {};
 
   const [amount, setamount] = useState(totalAmount + 50);
-  const [ticketData, setTicketData] = useState(null); // Store ticket from backend
-  const [showTicketOptions, setShowTicketOptions] = useState(false); // Show download/share buttons
-  
-  // If no data was passed, redirect back to events
+  const [ticketData, setTicketData] = useState(null); 
+  const [showTicketOptions, setShowTicketOptions] = useState(false); // 
   if (!location.state) {
     console.log('No data received, redirecting to events');
     window.location.href = '/events';
     return null;
   }
-
-  // handlePayment Function
   const handlePayment = async () => {
     try {
       const res = await axios.post(`${import.meta.env.VITE_API}/payment/order`, {
@@ -98,25 +94,19 @@ const Checkout = () => {
     const rzp1 = new window.Razorpay(options);
     rzp1.open();
   }
-
-  // Mock data for selected event and seats - now using real data from props
-  const event = eventData ? {
-    title: eventData.title || "The Accountant²",
-    date: selectedTiming.split(' ')[0] || "2025-08-12",
-    time: selectedTiming.split(' ')[1] || "7:30 PM",
-    location: eventData.venue || "PVR Cinemas, Downtown",
-    poster: eventData.poster || "https://m.media-amazon.com/images/I/91dAIcmOjAL._AC_UF1000,1000_QL80_.jpg",
-    duration: eventData.duration || "2h 15m",
-    genre: eventData.genre || "Action, Thriller",
-  } : {
-    title: "The Accountant²",
-    date: "2025-08-12",
-    time: "7:30 PM",
-    location: "PVR Cinemas, Downtown",
-    poster: "https://m.media-amazon.com/images/I/91dAIcmOjAL._AC_UF1000,1000_QL80_.jpg",
-    duration: "2h 15m",
-    genre: "Action, Thriller",
-  };
+  const fetchEvent = async () => {
+    console.log(id);
+    try {
+      const response = await axios.get(`${import.meta.env.VITE_API}/events/get-events/${id}`);
+      console.log(response.data)
+      setEvent(response.data.event);
+    } catch (error) {
+      console.log(error)
+    }
+  }
+  useEffect(()=> {
+    fetchEvent();
+  },[])
   
   const seatPrice = ticketCost || 350;
   const convenienceFee = 50;
@@ -177,8 +167,6 @@ const Checkout = () => {
   const sharePDF = async () => {
     if (!ticketData) return;
     const doc = new jsPDF({ unit: 'pt', format: 'a4' });
-    // ... same as generatePDF ...
-    // HostMyShow logo as styled text
     doc.setFontSize(28);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor('#3b82f6');
@@ -228,7 +216,13 @@ const Checkout = () => {
       toast.error('Sharing not supported on this device.');
     }
   };
-
+  const formatDate = (date) => {
+    const dateObj = new Date(date);
+    const day = dateObj.getDate();
+    const month = dateObj.getMonth() + 1;
+    const year = dateObj.getFullYear();
+    return `${day}/${month}/${year}`;
+  }
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-12 ">
       <div className="glass rounded-2xl shadow-xl p-8 w-full max-w-2xl flex flex-col items-center border border-blue-400/20">
@@ -236,16 +230,16 @@ const Checkout = () => {
 
         {/* Event Details Section */}
         <div className="flex flex-col md:flex-row items-center gap-8 w-full mb-8 pb-8 border-b border-blue-400/20">
-          <img src={event.poster} alt={event.title} className="w-32 h-44 object-cover rounded-lg shadow-lg border-2 border-blue-500" />
+          <img src={event.banner} alt={event.title} className="w-32 h-44 object-cover rounded-lg shadow-lg border-2 border-blue-500" />
           <div className="flex-1 text-center md:text-left">
             <h3 className="text-2xl font-bold text-white mb-2">{event.title}</h3>
             <p className="text-blue-200 text-sm flex items-center justify-center md:justify-start gap-2 mb-1">
-              <Calendar className="w-4 h-4" /> {event.date} • {event.time}
+              <Calendar className="w-4 h-4" /> {formatDate(event.eventDateTime)}
             </p>
             <p className="text-blue-200 text-sm flex items-center justify-center md:justify-start gap-2 mb-1">
               <MapPin className="w-4 h-4" /> {event.location}
             </p>
-            <p className="text-blue-300 text-xs mt-2">Duration: {event.duration} | Genre: {event.genre}</p>
+            <p className="text-blue-300 text-xs mt-2"> Category : {event.eventType}</p>
           </div>
         </div>
 
@@ -273,7 +267,7 @@ const Checkout = () => {
           <div className="w-full flex justify-between items-center text-white font-bold text-2xl pt-4 border-t border-blue-400/20">
             <span>Total Payable</span>
             <span className="flex items-center gap-2">
-              <DollarSign className="w-5 h-5" /> ₹{finalTotal}
+              <span className="w-5 h-5" /> ₹{finalTotal}
             </span>
           </div>
         </div>

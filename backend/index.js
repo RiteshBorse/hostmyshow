@@ -41,7 +41,7 @@ import paymentRouter from "./routes/payment.routes.js"
 app.use("/api/payment" , paymentRouter)
 
 import reviewRouter from "./routes/reveiw.route.js"
-app.use("/api/reviews" , reviewRouter);
+app.use("/api/review" , reviewRouter);
 
 app.listen(process.env.PORT || 8000 , ()=> {
     connectDB();

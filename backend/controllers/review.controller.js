@@ -1,4 +1,5 @@
 import Review from "../models/review.model.js";
+import { User } from "../models/user.model.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import Sentiment from "sentiment";
 
@@ -15,6 +16,7 @@ const addReview = asyncHandler(async (req, res) => {
   }
 
   const user_id = req.user.id;
+  const username = await User.findById(user_id)
 
   const result = sentiment.analyze(review);
   let sentimentCategory = "neutral";
@@ -23,7 +25,7 @@ const addReview = asyncHandler(async (req, res) => {
   else if (result.score < -1) sentimentCategory = "negative";
 
 
-  const newReview = new Review({ event_id, user_id, review, sentiment: sentimentCategory , score: result.score });
+  const newReview = new Review({ event_id, user_id, review, sentiment: sentimentCategory , score: result.score , username });
   await newReview.save();
 
   res.status(201).send({

@@ -24,13 +24,6 @@ const Checkout = () => {
   const [ticketData, setTicketData] = useState(null); // Store ticket from backend
   const [showTicketOptions, setShowTicketOptions] = useState(false); // Show download/share buttons
   
-  // Log received data
-  console.log('Checkout received data:');
-  console.log('Selected Seats:', selectedSeats);
-  console.log('Selected Timing:', selectedTiming);
-  console.log('Total Amount:', totalAmount);
-  console.log('Event Data:', eventData);
-
   // If no data was passed, redirect back to events
   if (!location.state) {
     console.log('No data received, redirecting to events');

@@ -29,8 +29,6 @@ const createOrder = asyncHandler(async (req , res) => {
 const verifyPayment = asyncHandler(async (req , res) => {
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
 
-    // console.log("req.body", req.body);
-
     try {
         // Create Sign
         const sign = razorpay_order_id + "|" + razorpay_payment_id;

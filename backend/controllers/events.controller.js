@@ -77,7 +77,6 @@ const getEventSeatsAndTimings = asyncHandler(async (req, res) => {
 const getMyEvents = asyncHandler(async(req , res) => {
   const userId = req.user.id ;
   const events = await Event.find({organizer : userId}).select("-seatMap")
-console.log(events)
   if(!events.length)
 {
   return res.status(404).json({
@@ -333,7 +332,6 @@ const getOrganizerSummary = asyncHandler(async (req , res) => {
   for(let a of events){
       sum += a.totalBookings;
   }
-  console.log(sum)
   const bookings = await Booking.find({ organizer_id: organizerId }).select("paymentAmt");
 
   let totalRevenue = 0;
@@ -405,7 +403,6 @@ const generateTicketQR = async (data) => {
 const bookTicket = asyncHandler(async (req, res) => {
   const user_id = req.user.id;
   const { event_id, booking_dateTime, seats, payment_id, paymentAmt } = req.body;
-  console.log(req.body)
   if (!event_id || !booking_dateTime || !seats || !payment_id || !paymentAmt) {
     return res.status(400).json({
       success: false,

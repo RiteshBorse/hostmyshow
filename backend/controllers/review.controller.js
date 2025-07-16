@@ -17,7 +17,6 @@ const addReview = asyncHandler(async (req, res) => {
   const user_id = req.user.id;
 
   const result = sentiment.analyze(review);
-  console.log(result);
   let sentimentCategory = "neutral";
 
   if (result.score > 1) sentimentCategory = "positive";

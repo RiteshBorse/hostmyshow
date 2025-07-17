@@ -506,6 +506,25 @@ const content = {
   await mail(content);
 });
 
+const getBookedEvents = asyncHandler(async (req, res) => {
+  const userId = req.user.id;
+
+  const bookings = await Booking.find({ user_id: userId }).populate({
+    path: 'event_id',
+    select: 'title banner status eventDateTime'
+  });
+
+  const validEvents = bookings
+    .filter(b => b.event_id)
+    .map(b => b.event_id); 
+
+  res.status(200).send({
+    success: true,
+    message: 'Booked events fetched successfully',
+    count: validEvents.length,
+    data: validEvents,
+  });
+});
 
 
-export { getEvents, getEventById, postEvent, getEventSeatsAndTimings , getMyEvents , getMyEventById , updateMyEvent , deleteMyEvent , getBookings , getMyBookings , getOrganizerSummary ,  bookTicket , checkSeatsAvailability };
+export { getEvents, getEventById, postEvent, getEventSeatsAndTimings , getMyEvents , getMyEventById , updateMyEvent , deleteMyEvent , getBookings , getMyBookings , getOrganizerSummary ,  bookTicket , checkSeatsAvailability  , getBookedEvents};

@@ -154,7 +154,7 @@ const AddEvent = () => {
       seatMap,
       cost: Number(form.cost),
       certificate: form.certificate,
-      special: form.personalized ? 'personalized' : form.eventTier || undefined,
+      special: form.eventTier || "none",
     };
 
     try {
@@ -368,7 +368,7 @@ const AddEvent = () => {
         {step === 4 && (
           <div className="space-y-4 glass py-8 px-16 flex flex-col w-full rounded-2xl">
             <h2 className="text-2xl font-bold mb-6">Select Event Tier</h2>
-            <div className="grid grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {/* Elite Tier */}
               <div
                 className={`relative flex flex-col p-6 rounded-xl border-2 transition-all cursor-pointer
@@ -395,7 +395,7 @@ const AddEvent = () => {
                     <svg className="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
                     </svg>
-                    Priority support
+                    24/7 Priority support
                   </li>
                   <li className="flex items-center gap-2">
                     <svg className="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -407,7 +407,7 @@ const AddEvent = () => {
                     <svg className="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
                     </svg>
-                    Analytics dashboard
+                    Advanced analytics
                   </li>
                 </ul>
               </div>
@@ -438,13 +438,50 @@ const AddEvent = () => {
                     <svg className="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
                     </svg>
-                    Priority listing
+                    Priority support
                   </li>
                   <li className="flex items-center gap-2">
                     <svg className="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
                     </svg>
                     Basic analytics
+                  </li>
+                </ul>
+              </div>
+
+              {/* Spotlight Tier */}
+              <div
+                className={`relative flex flex-col p-6 rounded-xl border-2 transition-all cursor-pointer
+                  ${form.eventTier === 'spotlight' 
+                    ? 'border-yellow-500 bg-yellow-500/10 shadow-lg shadow-yellow-500/20' 
+                    : 'border-white/30 hover:border-yellow-400/50 hover:bg-yellow-500/5'
+                  }`}
+                onClick={() => handleChange({ target: { name: 'eventTier', value: 'spotlight' } })}
+              >
+                <div className="absolute -top-3 -right-3">
+                  <span className="bg-yellow-500 text-white px-3 py-1 rounded-full text-sm">
+                    Featured
+                  </span>
+                </div>
+                <h3 className="text-xl font-bold mb-4 text-yellow-400">Spotlight</h3>
+                <ul className="space-y-2 text-sm mb-4">
+                  <li className="flex items-center gap-2">
+                    <svg className="w-5 h-5 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    Homepage feature
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <svg className="w-5 h-5 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    Email promotions
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <svg className="w-5 h-5 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    Standard support
                   </li>
                 </ul>
               </div>
@@ -477,6 +514,38 @@ const AddEvent = () => {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
                     </svg>
                     Basic support
+                  </li>
+                </ul>
+              </div>
+
+              {/* None/Standard Tier */}
+              <div
+                className={`relative flex flex-col p-6 rounded-xl border-2 transition-all cursor-pointer
+                  ${form.eventTier === 'none' 
+                    ? 'border-gray-500 bg-gray-500/10 shadow-lg shadow-gray-500/20' 
+                    : 'border-white/30 hover:border-gray-400/50 hover:bg-gray-500/5'
+                  }`}
+                onClick={() => handleChange({ target: { name: 'eventTier', value: 'none' } })}
+              >
+                <h3 className="text-xl font-bold mb-4 text-gray-400">Standard</h3>
+                <ul className="space-y-2 text-sm mb-4">
+                  <li className="flex items-center gap-2">
+                    <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    Basic listing
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    Standard features
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    Email support
                   </li>
                 </ul>
               </div>

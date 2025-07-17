@@ -155,4 +155,24 @@ const login = asyncHandler(async (req, res) => {
         });
 });
 
-export { register, verifyOtp, login };
+const getUserProfile = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user.id)
+   .populate("eventsOrganized", "title banner  status eventDateTime")
+    .populate("eventsAttended", "title banner status eventDateTime")
+
+
+  if (!user) {
+    return res.status(404).json({
+      success: false,
+      message: "User not found",
+    });
+  }
+
+  return res.status(200).json({
+    success: true,
+    user,
+    message: "User profile fetched successfully",
+  });
+});
+
+export { register, verifyOtp, login , getUserProfile };

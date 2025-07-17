@@ -419,8 +419,6 @@ const bookTicket = asyncHandler(async (req, res) => {
     });
   }
 
-  console.log(event)
-
   const seatList = seats.split(',').map(s => s.trim());
 
   const invalidSeats = [];
@@ -505,8 +503,7 @@ const content = {
   ],
 };
 
-// Send the email
-await mail(content);
+  await mail(content);
 });
 
 

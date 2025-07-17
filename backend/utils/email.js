@@ -158,3 +158,116 @@ export const confirmationFormat = (title, booking_time, seats, userid, ticket_qr
 </html>
   `;
 };
+
+export const eventMarketingFormat = (event) => {
+  const year = new Date().getFullYear();
+  
+  return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>${event.title} - Event Announcement</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f6f8fa; color: #333;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f6f8fa; padding: 20px;">
+    <tr>
+      <td align="center">
+        <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
+          <!-- Header Banner -->
+          <tr>
+            <td>
+              <img src="cid:event-banner" alt="${event.title}" style="width: 100%; max-height: 300px; object-fit: cover;">
+            </td>
+          </tr>
+
+          <!-- Event Title Section -->
+          <tr>
+            <td style="background-color: #1a237e; color: #ffffff; padding: 30px; text-align: center;">
+              <h1 style="margin: 0; font-size: 28px; margin-bottom: 10px;">${event.title}</h1>
+              <p style="margin: 0; font-size: 16px; color: #e3f2fd;">🗓️ ${new Date(event.eventDateTime).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+              <p style="margin: 5px 0; font-size: 16px; color: #e3f2fd;">⏰ </p>
+              <p style="margin: 5px 0; font-size: 16px; color: #e3f2fd;">📍 ${event.location}</p>
+            </td>
+          </tr>
+
+          <!-- Main Content -->
+          <tr>
+            <td style="padding: 30px;">
+              <!-- Description -->
+              <div style="margin-bottom: 25px;">
+                <h2 style="color: #1a237e; margin-bottom: 15px;">About The Event</h2>
+                <p style="line-height: 1.6; color: #555;">${event.description}</p>
+              </div>
+
+              <!-- Highlights -->
+              <div style="margin-bottom: 25px;">
+                <h2 style="color: #1a237e; margin-bottom: 15px;">Event Highlights</h2>
+                <table width="100%" style="border-collapse: separate; border-spacing: 0 10px;">
+                  <tr>
+                    <td width="50%" style="padding: 15px; background-color: #e8eaf6; border-radius: 6px;">
+                      <p style="margin: 0; color: #1a237e;">🎫 Limited Seats Available</p>
+                      <p style="margin: 5px 0 0 0; font-size: 14px; color: #555;">Book early to secure your spot</p>
+                    </td>
+                    <td width="50%" style="padding: 15px; background-color: #e8eaf6; border-radius: 6px;">
+                      <p style="margin: 0; color: #1a237e;">💰 Ticket Price</p>
+                      <p style="margin: 5px 0 0 0; font-size: 14px; color: #555;">Starting from ₹${event.cost}</p>
+                    </td>
+                  </tr>
+                  ${event.certificate ? `
+                  <tr>
+                    <td width="50%" style="padding: 15px; background-color: #e8eaf6; border-radius: 6px;">
+                      <p style="margin: 0; color: #1a237e;">📜 Certificate</p>
+                      <p style="margin: 5px 0 0 0; font-size: 14px; color: #555;">Participation certificate included</p>
+                    </td>
+                  ` : ''}
+                  ${event.personalized ? `
+                    <td width="50%" style="padding: 15px; background-color: #e8eaf6; border-radius: 6px;">
+                      <p style="margin: 0; color: #1a237e;">🌐 Personalized Website</p>
+                      <p style="margin: 5px 0 0 0; font-size: 14px; color: #555;">Exclusive event portal</p>
+                    </td>
+                  </tr>
+                  ` : ''}
+                </table>
+              </div>
+
+              <!-- CTA Button -->
+              <div style="text-align: center; margin: 35px 0;">
+                <a href="${process.env.FRONTEND_URL}" style="background-color: #1a237e; color: #ffffff; padding: 15px 30px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">
+                  Book Your Tickets Now
+                </a>
+              </div>
+
+              <!-- Additional Info -->
+              <div style="background-color: #f5f5f5; padding: 20px; border-radius: 6px; margin-top: 20px;">
+                <p style="margin: 0; font-size: 14px; color: #666; line-height: 1.5;">
+                  ⚡ Early bird discounts available<br>
+                  📞 For inquiries, contact our support team<br>
+                  ⏰ Limited time offer
+                </p>
+              </div>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="background-color: #1a237e; color: #ffffff; padding: 20px; text-align: center;">
+              <p style="margin: 0; font-size: 14px;">Follow us for more exciting events!</p>
+              <div style="margin: 15px 0;">
+                <a href="#" style="color: #ffffff; text-decoration: none; margin: 0 10px;">Facebook</a>
+                <a href="#" style="color: #ffffff; text-decoration: none; margin: 0 10px;">Twitter</a>
+                <a href="#" style="color: #ffffff; text-decoration: none; margin: 0 10px;">Instagram</a>
+              </div>
+              <p style="margin: 15px 0 0 0; font-size: 12px; color: #e3f2fd;">
+                &copy; ${year} HostMyShow. All rights reserved.
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+  `;
+};

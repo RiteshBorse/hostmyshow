@@ -40,8 +40,11 @@ app.use("/api/events" , eventsRouter);
 import paymentRouter from "./routes/payment.routes.js"
 app.use("/api/payment" , paymentRouter)
 
-import reviewRouter from "./routes/reveiw.route.js"
+import reviewRouter from "./routes/reveiw.routes.js"
 app.use("/api/review" , reviewRouter);
+
+import marketingRouter from "./routes/marketing.routes.js"
+app.use("/api/marketing" , marketingRouter)
 
 app.listen(process.env.PORT || 8000 , ()=> {
     connectDB();

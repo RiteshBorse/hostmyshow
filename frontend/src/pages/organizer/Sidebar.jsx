@@ -56,6 +56,16 @@ const Sidebar = () => (
           >
             <Ticket className="w-5 h-5" /> Reviews
           </NavLink>
+        </li>        
+        <li>
+          <NavLink
+            to="/organizer/marketing"
+            className={({ isActive }) =>
+              `flex items-center gap-3 text-lg transition-colors px-3 py-2 rounded-lg ${isActive ? 'bg-blue-700 text-white' : 'hover:text-blue-300'}`
+            }
+          >
+            <Ticket className="w-5 h-5" /> Marketing
+          </NavLink>
         </li>
       </ul>
     </nav>

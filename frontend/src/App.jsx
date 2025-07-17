@@ -4,6 +4,7 @@ import axios from 'axios'
 import { userStore } from './context/userContext'
 import toast from 'react-hot-toast'
 import Reviews from './pages/organizer/Reviews'
+import Marketing from './pages/organizer/Marketing'
 
 const Landing = lazy(() => import('./pages/Landing'));
 const Navbar = lazy(() => import('./components/Navbar'));
@@ -84,6 +85,7 @@ const App = () => {
             <Route path="list-shows" element={<ListShows />} />
             <Route path="list-bookings" element={<ListBookings />} />
             <Route path="reviews" element={<Reviews />} />
+            <Route path="marketing" element={<Marketing />} />
             <Route path="show/:id" element={<ShowDetails />} />
             <Route path="edit-event/:id" element={<EditEvent />} />
           </Route>

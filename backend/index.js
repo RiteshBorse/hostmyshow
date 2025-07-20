@@ -53,6 +53,10 @@ app.get("/api/start" , (req , res) => {
     })
 })
 
+//cron file import
+import "./cron/updatedEventsStatus.js" 
+
+
 app.listen(process.env.PORT || 8000 , ()=> {
     connectDB();
     console.log(`Server listening on ${process.env.PORT || 8000}`)

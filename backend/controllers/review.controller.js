@@ -75,5 +75,19 @@ const getAllReviews = asyncHandler(async (req, res) => {
   });
 });
 
+const getTopPositiveReviews = asyncHandler(async (req, res) => {
 
-export{getReviews , addReview , getAllReviews};
+  const topReviews = await Review.find({ sentiment: "positive" })
+    .sort({ score: -1 }) 
+    .limit(4)
+    .populate("user_id" , "username") 
+
+  res.status(200).send({
+    message: "Top positive reviews fetched successfully",
+    success: true,
+    reviews: topReviews
+  });
+});
+
+
+export{getReviews , addReview , getAllReviews , getTopPositiveReviews };

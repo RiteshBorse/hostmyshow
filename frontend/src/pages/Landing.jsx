@@ -1,14 +1,17 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { ArrowRight, Play, Star, ChevronLeft, ChevronRight, Sparkles, Shield, BarChart3 } from "lucide-react"
 import { Link } from "react-router-dom"
+import axios from "axios"
 
 const Landing = () => {
+  const [testimonials , setTestimonials] = useState([]);
   const [currentTestimonial, setCurrentTestimonial] = useState(0)
-const testimonials = [
+
+/*const testimonials = [
   {
     name: "Sarah Chen",
     role: "Tech Conference Organizer",
@@ -36,7 +39,7 @@ const testimonials = [
     avatar: "/placeholder.svg?height=40&width=40",
     rating: 5,
   },
-]
+]*/
   const nextTestimonial = () => {
     setCurrentTestimonial((prev) => (prev + 1) % testimonials.length)
   }
@@ -44,6 +47,21 @@ const testimonials = [
   const prevTestimonial = () => {
     setCurrentTestimonial((prev) => (prev - 1 + testimonials.length) % testimonials.length)
   }
+
+  useEffect(() => {
+  const fetchTestimonials = async () => {
+    try {
+      const response = await axios.get(`${import.meta.env.VITE_API}/review/top`);
+      console.log("fetched testimonials : " , response.data);
+      setTestimonials(response.data.reviews || []);
+    } catch (error) {
+      console.error("failed to fetch testimonials", error);
+    }
+  };
+
+  fetchTestimonials();
+}, []);
+
 
   return (
     <div className="min-h-screen">
@@ -179,77 +197,78 @@ const testimonials = [
       </section>
 
       {/* Testimonials Section */}
-      <section id="testimonials" className="container mx-auto px-4 py-20">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold mb-4 text-white">Trusted by event organizers worldwide</h2>
-          <p className="text-xl text-blue-100">See what our community has to say about their experience</p>
-        </div>
+      {testimonials.length > 0 && (
+        <section id="testimonials" className="container mx-auto px-4 py-20">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold mb-4 text-white">Trusted by event organizers worldwide</h2>
+            <p className="text-xl text-blue-100">See what our community has to say about their experience</p>
+          </div>
 
-        <div className="max-w-4xl mx-auto">
-          <Card className="p-8 glass border-blue-400/20">
-            <CardContent className="p-0">
-              <div className="flex items-center justify-between mb-6">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={prevTestimonial}
-                  className="rounded-full text-blue-100 hover:bg-blue-400/10"
-                >
-                  <ChevronLeft className="w-5 h-5" />
-                </Button>
-                <div className="flex space-x-2">
-                  {testimonials.map((_, index) => (
-                    <div
-                      key={index}
-                      className={`w-2 h-2 rounded-full transition-colors ${
-                        index === currentTestimonial ? "bg-blue-400" : "bg-blue-400/30"
-                      }`}
-                    />
-                  ))}
-                </div>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={nextTestimonial}
-                  className="rounded-full text-blue-100 hover:bg-blue-400/10"
-                >
-                  <ChevronRight className="w-5 h-5" />
-                </Button>
-              </div>
-
-              <div className="text-center">
-                <div className="flex justify-center mb-4">
-                  {[...Array(testimonials[currentTestimonial].rating)].map((_, i) => (
-                    <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />
-                  ))}
+          <div className="max-w-4xl mx-auto">
+            <Card className="p-8 glass border-blue-400/20">
+              <CardContent className="p-0">
+                <div className="flex items-center justify-between mb-6">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={prevTestimonial}
+                    className="rounded-full text-blue-100 hover:bg-blue-400/10"
+                  >
+                    <ChevronLeft className="w-5 h-5" />
+                  </Button>
+                  <div className="flex space-x-2">
+                    {testimonials.map((_, index) => (
+                      <div
+                        key={index}
+                        className={`w-2 h-2 rounded-full transition-colors ${
+                          index === currentTestimonial ? "bg-blue-400" : "bg-blue-400/30"
+                        }`}
+                      />
+                    ))}
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={nextTestimonial}
+                    className="rounded-full text-blue-100 hover:bg-blue-400/10"
+                  >
+                    <ChevronRight className="w-5 h-5" />
+                  </Button>
                 </div>
 
-                <blockquote className="text-lg mb-6 italic text-blue-100">
-                  "{testimonials[currentTestimonial].content}"
-                </blockquote>
+                <div className="text-center">
+                  <div className="flex justify-center mb-4">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />
+                    ))}
+                  </div>
 
-                <div className="flex items-center justify-center space-x-4">
-                  <Avatar>
-                    <AvatarImage src={testimonials[currentTestimonial].avatar || "/placeholder.svg"} />
-                    <AvatarFallback className="bg-blue-500 text-white">
-                      {testimonials[currentTestimonial].name
-                        .split(" ")
-                        .map((n) => n[0])
-                        .join("")}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="text-left">
-                    <p className="font-semibold text-white">{testimonials[currentTestimonial].name}</p>
-                    <p className="text-sm text-blue-200">
-                      {testimonials[currentTestimonial].role} • {testimonials[currentTestimonial].company}
-                    </p>
+                  <blockquote className="text-lg mb-6 italic text-blue-100">
+                    "{testimonials[currentTestimonial].review}"
+                  </blockquote>
+
+                  <div className="flex items-center justify-center space-x-4">
+                    <Avatar>
+                      <AvatarImage src={"/placeholder.svg"} />
+                      <AvatarFallback className="bg-blue-500 text-white">
+                        {testimonials[currentTestimonial]?.user_id?.username
+                          ?.split(" ")
+                          .map((n) => n[0])
+                          .join("") || "U"}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="text-left">
+                      <p className="font-semibold text-white">
+                        {testimonials[currentTestimonial]?.user_id?.username || "Anonymous"}
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </section>
+              </CardContent>
+            </Card>
+          </div>
+        </section>
+      )}
 
       {/* CTA Section */}
       <section className="container mx-auto px-4 py-20">

@@ -55,10 +55,21 @@ const Login = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 pt-12 px-8">
-      <div className="relative backdrop-blur-xl bg-white/5 border border-white/10 rounded-3xl p-10 shadow-2xl w-[560px]">
-        <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-white/2.5 rounded-3xl"></div>
-        <div className="relative z-10">
+    <div className="min-h-[90vh] flex items-center justify-center p-4 pt-12 px-8">
+      <div className="relative backdrop-blur-xl bg-white/5 border border-white/10 rounded-3xl p-10 shadow-2xl w-[960px] flex justify-between gap-24">
+        <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-white/5 rounded-3xl"></div>
+
+        {/* Left side - Illustration */}
+        <div className="relative z-10 hidden lg:flex lg:w-1/2 items-center justify-center">
+          <img
+            src="/images/login.svg"
+            alt="Login Illustration"
+            className="w-full h-auto max-w-[400px] drop-shadow-2xl"
+          />
+        </div>
+
+        {/* Right side - Login Form */}
+        <div className="relative z-10 w-full lg:w-1/2">
           <div className="text-center mb-8">
             <h1 className="text-white text-4xl font-bold mb-2 bg-gradient-to-r from-white to-gray-300 bg-clip-text">
               Log In

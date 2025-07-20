@@ -52,7 +52,7 @@ const Profile = () => {
   )
 
   return (
-    <div className="min-h-screen py-12 px-4 bg-blue-950">
+    <div className="min-h-screen py-12 px-4">
       <div className="max-w-5xl mx-auto glass rounded-2xl overflow-hidden shadow-xl">
 
         {/* Header */}

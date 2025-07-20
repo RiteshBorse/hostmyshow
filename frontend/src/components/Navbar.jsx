@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "./ui/button";
 import { userStore } from "@/context/userContext";
+import axios from "axios";
+import toast from "react-hot-toast";
 
 const Navbar = () => {
   const isAuth = userStore((state) => state.isAuth);
@@ -11,9 +13,18 @@ const Navbar = () => {
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    logout();
-    navigate("/sign-up");
+  const handleLogout = async () => {
+    try {
+      const res = await axios.post(`${import.meta.env.VITE_API}/user/logout`);
+      if(res.data.success){
+          logout();
+          toast.success("Logout Successful");
+          navigate("/login");
+      }
+    } catch (error) {
+        console.log(error);
+        toast.error("Error Occured");
+    }
   };
 
   useEffect(() => {
@@ -55,7 +66,7 @@ const Navbar = () => {
 
           {/* If NOT logged in */}
           {!isAuth && (
-            <Link to="/sign-up">
+            <Link to="/login">
               <Button
                 variant="outline"
                 size="lg"

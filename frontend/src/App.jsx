@@ -1,4 +1,4 @@
-import React, { Suspense, lazy } from 'react'
+import React, { Suspense, lazy, useEffect, useRef, useState } from 'react'
 import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom'
 import axios from 'axios'
 import { userStore } from './context/userContext'
@@ -63,7 +63,48 @@ const Loader = () => (
   </div>
 );
 
+const LoaderBackend = () => (
+  <div className="min-h-screen flex items-center justify-center bg-transparent">
+    <div className="loader"></div>
+    <p className='text-white text-2xl'>Backend is Starting Just wait for a while.....</p>
+  </div>
+);
+
 const App = () => {
+  const [backend, setBackend] = useState(false);
+  const backendRef = useRef(false); 
+
+  const start = async () => {
+    try {
+      const res = await axios.get(`${import.meta.env.VITE_API}/start`);
+      console.log(res.data);
+      if (res.data.success) {
+        setBackend(true);
+        backendRef.current = true; 
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    start();
+    let attempts = 0;
+    const intervalId = setInterval(() => {
+      start();
+      attempts++;
+
+      if (backendRef.current || attempts >= 10) {
+        clearInterval(intervalId);
+      }
+    }, 5000);
+
+    return () => clearInterval(intervalId);
+  }, []);
+
+  if (!backend) {
+    return <LoaderBackend />;
+  }
   return (
     <BrowserRouter>
       <Suspense fallback={<Loader />}>

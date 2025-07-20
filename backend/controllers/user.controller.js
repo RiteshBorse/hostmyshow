@@ -155,4 +155,15 @@ const login = asyncHandler(async (req, res) => {
         });
 });
 
-export { register, verifyOtp, login };
+const logout = asyncHandler(async (req ,res) => {
+    res.clearCookie("token" , {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+    });
+    return res.status(200).send({
+        message : "Logout Successfull", 
+        success : true
+    })
+})
+
+export { register, verifyOtp, login , logout };

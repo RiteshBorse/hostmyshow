@@ -46,6 +46,13 @@ app.use("/api/review" , reviewRouter);
 import marketingRouter from "./routes/marketing.routes.js"
 app.use("/api/marketing" , marketingRouter)
 
+app.get("/api/start" , (req , res) => {
+    return res.status(200).send({
+        message : "Server Started",
+        success : true
+    })
+})
+
 app.listen(process.env.PORT || 8000 , ()=> {
     connectDB();
     console.log(`Server listening on ${process.env.PORT || 8000}`)

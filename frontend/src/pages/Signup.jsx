@@ -134,7 +134,6 @@ const Signup = () => {
       );
       setDialogOpen(false);
       toast.success(response.data.message);
-      await login(response.data.user);
       navigate("/");
     } catch (error) {
       toast.error(error.response.data.message);

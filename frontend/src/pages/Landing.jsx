@@ -3,7 +3,18 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { ArrowRight, Play, Star, ChevronLeft, ChevronRight, Sparkles, Shield, BarChart3 } from "lucide-react"
+import { 
+  ArrowRight, 
+  Play, 
+  Star, 
+  ChevronLeft, 
+  ChevronRight, 
+  Sparkles, 
+  Shield, 
+  BarChart3,
+  Users,
+  Award // or ScrollText, depending on your preference
+} from "lucide-react"
 import { Link } from "react-router-dom"
 import axios from "axios"
 
@@ -11,35 +22,6 @@ const Landing = () => {
   const [testimonials , setTestimonials] = useState([]);
   const [currentTestimonial, setCurrentTestimonial] = useState(0)
 
-/*const testimonials = [
-  {
-    name: "Sarah Chen",
-    role: "Tech Conference Organizer",
-    company: "DevSummit 2024",
-    content:
-      "HostMyShow transformed how we manage our 5,000+ attendee conference. The AI planner suggested the perfect session flow and the NFT tickets created incredible buzz.",
-    avatar: "/placeholder.svg?height=40&width=40",
-    rating: 5,
-  },
-  {
-    name: "Marcus Rodriguez",
-    role: "Hackathon Director",
-    company: "CodeCrush Hackathon",
-    content:
-      "The real-time analytics and attendee engagement features helped us create the most successful hackathon in our company's history.",
-    avatar: "/placeholder.svg?height=40&width=40",
-    rating: 5,
-  },
-  {
-    name: "Emily Watson",
-    role: "Startup Founder",
-    company: "TechLaunch Summit",
-    content:
-      "From planning to execution, HostMyShow made our product launch event seamless. The face recognition check-in was a game-changer for networking.",
-    avatar: "/placeholder.svg?height=40&width=40",
-    rating: 5,
-  },
-]*/
   const nextTestimonial = () => {
     setCurrentTestimonial((prev) => (prev + 1) % testimonials.length)
   }
@@ -152,7 +134,7 @@ const Landing = () => {
         <div className="text-center mb-16">
           <h2 className="text-4xl font-bold mb-4 text-white">Everything you need to create extraordinary events</h2>
           <p className="text-xl text-blue-100 max-w-2xl mx-auto">
-            Powerful tools and AI assistance to make your events unforgettable
+            Comprehensive tools to manage your events from start to finish
           </p>
         </div>
 
@@ -162,10 +144,9 @@ const Landing = () => {
               <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-lg flex items-center justify-center mb-4">
                 <Sparkles className="w-6 h-6 text-white" />
               </div>
-              <h3 className="text-xl font-semibold mb-2 text-white">AI Event Planner</h3>
+              <h3 className="text-xl font-semibold mb-2 text-white">Event Tiers</h3>
               <p className="text-blue-100">
-                Describe your vision and let AI generate schedules, layouts, and session topics tailored to your
-                audience.
+                Choose from Elite, Prime, Spotlight, and Sponsored tiers to get the perfect visibility and features for your event
               </p>
             </CardContent>
           </Card>
@@ -175,21 +156,57 @@ const Landing = () => {
               <div className="w-12 h-12 bg-gradient-to-br from-purple-400 to-purple-600 rounded-lg flex items-center justify-center mb-4">
                 <Shield className="w-6 h-6 text-white" />
               </div>
-              <h3 className="text-xl font-semibold mb-2 text-white">NFT Tickets</h3>
+              <h3 className="text-xl font-semibold mb-2 text-white">Smart Ticketing</h3>
               <p className="text-blue-100">
-                Create unique, collectible tickets with QR codes and animated badges that attendees will treasure.
+                Secure QR-based tickets, flexible seat selection, and automated email confirmations for seamless entry management
               </p>
             </CardContent>
           </Card>
 
-          <Card className="p-6 glass border-blue-400/20 hover:glow-blue transition-all duration-300">
+          <Card className="p-6 glass border-blue-400/20 hover:glow-green transition-all duration-300">
             <CardContent className="p-0">
               <div className="w-12 h-12 bg-gradient-to-br from-green-400 to-green-600 rounded-lg flex items-center justify-center mb-4">
                 <BarChart3 className="w-6 h-6 text-white" />
               </div>
-              <h3 className="text-xl font-semibold mb-2 text-white">Real-time Analytics</h3>
+              <h3 className="text-xl font-semibold mb-2 text-white">Marketing & Analytics</h3>
               <p className="text-blue-100">
-                Track engagement, attendance, and feedback in real-time to optimize your event experience.
+                Email marketing campaigns, attendee feedback system, and comprehensive booking analytics
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="p-6 glass border-blue-400/20 hover:glow-orange transition-all duration-300">
+            <CardContent className="p-0">
+              <div className="w-12 h-12 bg-gradient-to-br from-orange-400 to-orange-600 rounded-lg flex items-center justify-center mb-4">
+                <Users className="w-6 h-6 text-white" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2 text-white">Organizer Dashboard</h3>
+              <p className="text-blue-100">
+                Manage events, track bookings, handle reviews, and access detailed revenue insights all in one place
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="p-6 glass border-blue-400/20 hover:glow-red transition-all duration-300">
+            <CardContent className="p-0">
+              <div className="w-12 h-12 bg-gradient-to-br from-red-400 to-red-600 rounded-lg flex items-center justify-center mb-4">
+                <Award className="w-6 h-6 text-white" /> {/* Changed from Certificate to Award */}
+              </div>
+              <h3 className="text-xl font-semibold mb-2 text-white">Certificates & Custom Sites</h3>
+              <p className="text-blue-100">
+                Optional participant certificates and personalized event microsites to enhance attendee experience
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="p-6 glass border-blue-400/20 hover:glow-indigo transition-all duration-300">
+            <CardContent className="p-0">
+              <div className="w-12 h-12 bg-gradient-to-br from-indigo-400 to-indigo-600 rounded-lg flex items-center justify-center mb-4">
+                <Star className="w-6 h-6 text-white" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2 text-white">Review System</h3>
+              <p className="text-blue-100">
+                Collect and manage attendee feedback with categorized positive, neutral, and negative reviews
               </p>
             </CardContent>
           </Card>

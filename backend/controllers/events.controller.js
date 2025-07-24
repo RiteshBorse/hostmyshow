@@ -5,6 +5,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import QRCode from 'qrcode';
 import { areArraysEqual } from "../utils/arrayUtils.js";
 import { confirmationFormat, mail } from "../utils/email.js";
+import dayjs from 'dayjs';
 
 const getEvents = asyncHandler(async (req, res) => {
   let events = await Event.find({}).select(
@@ -525,6 +526,5 @@ const getBookedEvents = asyncHandler(async (req, res) => {
     data: validEvents,
   });
 });
-
 
 export { getEvents, getEventById, postEvent, getEventSeatsAndTimings , getMyEvents , getMyEventById , updateMyEvent , deleteMyEvent , getBookings , getMyBookings , getOrganizerSummary ,  bookTicket , checkSeatsAvailability  , getBookedEvents};

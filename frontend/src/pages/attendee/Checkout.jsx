@@ -11,6 +11,7 @@ const Checkout = () => {
   const { id } = useParams();
   const location = useLocation();
   const [event, setEvent] = useState({})
+
   // Get data passed from Seats page
   const {
     selectedSeats = [],
@@ -112,6 +113,23 @@ const Checkout = () => {
   const convenienceFee = 50;
   const finalTotal = selectedSeats.length * seatPrice + convenienceFee;
 
+  const formatDate = (date) => {
+    const dateObj = new Date(date);
+    const day = dateObj.getDate();
+    const month = dateObj.getMonth() + 1;
+    const year = dateObj.getFullYear();
+    return `${day}/${month}/${year}`;
+  }
+  const formatTime = (date) => {
+    const dateObj = new Date(date);
+    let hours = dateObj.getHours();
+    let minutes = dateObj.getMinutes();
+    let seconds = dateObj.getSeconds();
+    hours = hours < 10 ? '0' + hours : hours;
+    minutes = minutes < 10 ? '0' + minutes : minutes;
+    seconds = seconds < 10 ? '0' + seconds : seconds;
+    return `${hours}:${minutes}:${seconds}`;
+};
   // PDF generation function
   const generatePDF = () => {
     if (!ticketData) return;
@@ -133,7 +151,7 @@ const Checkout = () => {
     // Details
     doc.setFontSize(12);
     let y = 130;
-    doc.text(`Date & Time: ${event.date} ${event.time}`, 40, y);
+    doc.text(`Date & Time: ${formatDate(event.eventDateTime)} ${formatTime(event.eventDateTime)}`, 40, y);
     y += 20;
     doc.text(`Venue: ${event.location}`, 40, y);
     y += 20;
@@ -216,13 +234,7 @@ const Checkout = () => {
       toast.error('Sharing not supported on this device.');
     }
   };
-  const formatDate = (date) => {
-    const dateObj = new Date(date);
-    const day = dateObj.getDate();
-    const month = dateObj.getMonth() + 1;
-    const year = dateObj.getFullYear();
-    return `${day}/${month}/${year}`;
-  }
+  
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-12 ">
       <div className="glass rounded-2xl shadow-xl p-8 w-full max-w-2xl flex flex-col items-center border border-blue-400/20">

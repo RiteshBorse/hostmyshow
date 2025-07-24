@@ -7,10 +7,9 @@ export const updateStatus = async () => {
   const events = await Event.find();
   console.log(`Running event status update at ${now.format()}`);
   console.log(`Found ${events.length} events`);
-
+  console.log(events)
   for (const event of events) {
     const eventStart = dayjs(event.eventDateTime[0]);
-
     let newStatus = 'upcoming';
     if (now.isAfter(eventStart.add(3, 'hour'))) {
       newStatus = 'completed';

@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, CalendarPlus, List, Ticket } from 'lucide-react';
+import { LayoutDashboard, CalendarPlus, List, Ticket, Star, Mail } from 'lucide-react';
 
 const Sidebar = () => (
   <aside className="w-64 glass p-6 shadow-lg flex flex-col">
@@ -54,7 +54,7 @@ const Sidebar = () => (
               `flex items-center gap-3 text-lg transition-colors px-3 py-2 rounded-lg ${isActive ? 'bg-blue-700 text-white' : 'hover:text-blue-300'}`
             }
           >
-            <Ticket className="w-5 h-5" /> Reviews
+            <Star className="w-5 h-5" /> Reviews
           </NavLink>
         </li>        
         <li>
@@ -64,7 +64,7 @@ const Sidebar = () => (
               `flex items-center gap-3 text-lg transition-colors px-3 py-2 rounded-lg ${isActive ? 'bg-blue-700 text-white' : 'hover:text-blue-300'}`
             }
           >
-            <Ticket className="w-5 h-5" /> Marketing
+            <Mail className="w-5 h-5" /> Marketing
           </NavLink>
         </li>
       </ul>
@@ -72,4 +72,4 @@ const Sidebar = () => (
   </aside>
 );
 
-export default Sidebar; 
+export default Sidebar;

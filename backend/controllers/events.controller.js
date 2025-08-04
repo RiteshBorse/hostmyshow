@@ -345,6 +345,9 @@ const getOrganizerSummary = asyncHandler(async (req , res) => {
     organizer: organizerId,
     status: "active"
   });
+  const totalUsers = await User.countDocuments({
+    role : "Attendee"
+  })
 
   return res.status(200).json({
     success: true,
@@ -353,7 +356,7 @@ const getOrganizerSummary = asyncHandler(async (req , res) => {
       totalBookings : sum,
       totalRevenue,
       activeShows : totalActiveEvents,
-      totalUsers : 354
+      totalUsers
     }
   });
 })

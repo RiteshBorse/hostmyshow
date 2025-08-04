@@ -13,8 +13,8 @@ import {
   Sparkles,
 } from 'lucide-react';
 
-const PROFILE_RITESH = "https://media.licdn.com/dms/image/v2/D4D03AQHPVOtEVdufkA/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1709465192531?e=1757548800&v=beta&t=TOWVk50k32L_7v2HThlg0OFtP49zEICP2aAm0W1NU-k"; // Replace with your actual photo path
-const PROFILE_SAKSHI = "https://media.licdn.com/dms/image/v2/D4D03AQF_F9C46Qdt3Q/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1729233246043?e=1757548800&v=beta&t=ypU6AG6OsBHzMAcuo4cgN8A4cPpWdvFUZYDMYxw6HvI"; // Replace with actual photo path
+const PROFILE_RITESH = "https://media.licdn.com/dms/image/v2/D4D03AQHPVOtEVdufkA/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1709465192531?e=1757548800&v=beta&t=TOWVk50k32L_7v2HThlg0OFtP49zEICP2aAm0W1NU-k";
+const PROFILE_SAKSHI = "https://media.licdn.com/dms/image/v2/D4D03AQF_F9C46Qdt3Q/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1729233246043?e=1757548800&v=beta&t=ypU6AG6OsBHzMAcuo4cgN8A4cPpWdvFUZYDMYxw6HvI"; 
 
 const techStack = [
   { name: 'React', icon: <Atom className="inline mr-2 text-cyan-300" /> },

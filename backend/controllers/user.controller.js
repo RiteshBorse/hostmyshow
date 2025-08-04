@@ -140,7 +140,8 @@ const login = asyncHandler(async (req, res) => {
     return res.status(200)
         .cookie("token", token, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
+            sameSite : "None",
+            secure: true,
             maxAge: 24 * 60 * 60 * 1000 
         })
         .send({
@@ -150,6 +151,7 @@ const login = asyncHandler(async (req, res) => {
                 username: user.username,
                 role: user.role
             },
+            token,
             message: "Login successful",
             success: true
         });

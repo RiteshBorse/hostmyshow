@@ -1,0 +1,41 @@
+config:
+  target: "http://localhost:8000"   # change to your deployed URL when testing Render
+  phases:
+    - duration: 60
+      arrivalRate: 50    # start with 50 users/sec, later try 100–200 for stress
+  variables:
+    email: "riteshborse008@gmail.com"
+    password: "ritesh2005"
+
+scenarios:
+  - name: "Login + Create Razorpay Order"
+    flow:
+      - post:
+          url: "/api/user/login"
+          json:
+            email: "{{ email }}"
+            password: "{{ password }}"
+          capture:
+            - json: "$.token"
+              as: "jwt"
+
+      - post:
+          url: "/api/payment/create-order"
+          headers:
+            Authorization: "Bearer {{ jwt }}"
+          json:
+            amount: 50000
+            currency: "INR"
+            receipt: "test_receipt_1"
+          capture:
+            - json: "$.order.id"
+              as: "orderId"
+
+      - post:
+          url: "/api/payment/verify"
+          headers:
+            Authorization: "Bearer {{ jwt }}"
+          json:
+            razorpay_payment_id: "pay_test123"
+            razorpay_order_id: "{{ orderId }}"
+            razorpay_signature: "sig_test123"

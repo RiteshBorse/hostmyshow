@@ -1,0 +1,42 @@
+config:
+  target: "http://localhost:8000"   # change to your deployed URL when testing Render
+  phases:
+    - duration: 60
+      arrivalRate: 50    # start with 50 users/sec, later try 100–200 for stress
+  variables:
+    email: "riteshborse008@gmail.com"
+    password: "ritesh2005"
+
+scenarios:
+  - name: "Login + Fetch Events"
+    flow:
+      # Step 1: Login and capture JWT
+      - post:
+          url: "/api/user/login"
+          json:
+            email: "{{ email }}"
+            password: "{{ password }}"
+          capture:
+            - json: "$.token"   # JWT is in { token: "..." }
+              as: "jwt"
+
+      # Step 2: Fetch events using captured JWT
+      - get:
+          url: "/api/events/get-events"
+          headers:
+            Authorization: "Bearer {{ jwt }}"
+
+      # Step 3: (Optional) Book a seat (uncomment & replace eventId for real test)
+      # - post:
+      #     url: "/api/bookings"
+      #     headers:
+      #       Authorization: "Bearer {{ jwt }}"
+      #     json:
+      #       eventId: "64f7b12abc1234"   # replace with a real event ID
+      #       seats: ["A1", "A2"]
+
+      # Step 4: (Optional) Fetch booking confirmation (uncomment if needed)
+      # - get:
+      #     url: "/api/bookings/me"
+      #     headers:
+      #       Authorization: "Bearer {{ jwt }}"

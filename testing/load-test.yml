@@ -1,0 +1,9 @@
+config:
+  target: "http://localhost:8000"   # Replace with your backend API URL
+  phases:
+    - duration: 60      # run test for 60 seconds
+      arrivalRate: 200  # simulate 200 new users per second
+scenarios:
+  - flow:
+      - get:
+          url: "/api/events/get-events"   # Example endpoint to test

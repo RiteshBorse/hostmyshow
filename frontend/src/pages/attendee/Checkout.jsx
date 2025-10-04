@@ -42,7 +42,7 @@ const Checkout = () => {
   }
   const handlePaymentVerify = async (data) => {
     try {
-      let checkSeats = await axios.post(`${import.meta.env.VITE_API}/events/check-seats` , {
+      let checkSeats = await axios.post(`${import.meta.env.VITE_API}/events/check-seats-with-locks` , {
         event_id : id,
         seats : selectedSeats
       });

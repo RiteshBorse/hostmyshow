@@ -437,11 +437,21 @@ const bookTicket = asyncHandler(async (req, res) => {
     });
 
     if (activeLocks.length > 0) {
-      const lockedSeats = activeLocks.map(lock => lock.seatLabel);
-      return res.status(400).json({
-        success: false,
-        message: `Seats ${lockedSeats.join(', ')} are currently being selected by other users`
-      });
+      // Check if any locked seats belong to other users
+      const otherUserLocks = activeLocks.filter(lock => 
+        lock.user_id.toString() !== user_id.toString()
+      );
+      
+      if (otherUserLocks.length > 0) {
+        const lockedSeats = otherUserLocks.map(lock => lock.seatLabel);
+        return res.status(400).json({
+          success: false,
+          message: `Seats ${lockedSeats.join(', ')} are currently being selected by other users`
+        });
+      }
+      
+      // If all locks belong to the current user, remove them after successful booking
+      // This will be handled after the booking is successful
     }
 
     // Check if seats are already booked
@@ -624,9 +634,20 @@ const lockSeat = asyncHandler(async (req, res) => {
     });
 
     if (existingLock && existingLock.isValid()) {
-      return res.status(400).json({
-        success: false,
-        message: 'Seat is currently being selected by another user'
+      // If the lock belongs to another user, deny the request
+      if (existingLock.user_id.toString() !== userId.toString()) {
+        return res.status(400).json({
+          success: false,
+          message: 'Seat is currently being selected by another user'
+        });
+      }
+      // If the lock belongs to the same user, extend the lock time
+      existingLock.expiresAt = new Date(Date.now() + 5 * 60 * 1000);
+      await existingLock.save();
+      return res.status(200).json({
+        success: true,
+        message: 'Seat lock extended successfully',
+        expiresAt: existingLock.expiresAt
       });
     }
 

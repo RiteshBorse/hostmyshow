@@ -20,6 +20,10 @@
 
 ---
 
+## Architecture
+<img width="7836" height="5779" alt="hostmysho (1)" src="https://github.com/user-attachments/assets/975c2bd6-16df-4ec5-9ab7-acb59fd7b87a" />
+
+
 ## Tech Stack
 
 ### Frontend

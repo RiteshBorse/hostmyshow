@@ -90,41 +90,219 @@ const Landing = () => {
           </div>
 
           {/* Platform Preview */}
-          <div className="relative">
-            <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-purple-600/20 blur-3xl -z-10" />
-            <Card className="p-8 glass border-blue-400/20">
-              <div className="grid md:grid-cols-2 gap-8 items-center">
-                <div className="space-y-4">
-                  <div className="glass-dark rounded-lg p-4 border border-blue-400/20">
-                    <div className="flex items-center space-x-3 mb-3">
-                      <div className="w-3 h-3 bg-green-400 rounded-full" />
-                      <div className="w-3 h-3 bg-yellow-400 rounded-full" />
-                      <div className="w-3 h-3 bg-red-400 rounded-full" />
-                    </div>
-                    <div className="space-y-2">
-                      <div className="h-4 bg-blue-400/20 rounded w-3/4" />
-                      <div className="h-4 bg-blue-400/20 rounded w-1/2" />
-                      <div className="h-6 bg-blue-500/30 rounded w-full" />
+        <div className="relative scale-[0.6] md:scale-[0.65] lg:scale-[0.7] xl:scale-[0.75] origin-center py-10 my-[-20px]">
+          <div className="relative z-10 max-w-7xl mx-auto px-8">
+           <div className="grid lg:grid-cols-2 gap-12 items-center lg:items-center justify-center lg:justify-between">
+                {/* Left side - Vertical Mobile Phone */}
+                <div className="relative flex justify-center lg:justify-end items-center">
+                  <div className="relative" style={{ perspective: '1500px' }}>
+                    {/* Glow effect behind phone */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-blue-500 via-cyan-500 to-purple-500 blur-3xl opacity-30 animate-pulse" />
+                    
+                    {/* Vertical Mobile Phone */}
+                    <div 
+                      className="relative transition-transform duration-700 hover:scale-105"
+                      style={{
+                        transform: 'rotateY(25deg) rotateX(8deg) rotateZ(-3deg)',
+                        transformStyle: 'preserve-3d',
+                        animation: 'float 6s ease-in-out infinite'
+                      }}
+                    >
+                      {/* Phone Frame */}
+                      <div className="relative bg-gradient-to-br from-slate-800 to-slate-900 rounded-[3.5rem] p-3 shadow-2xl border-2 border-slate-700"
+                          style={{ 
+                            width: '340px', 
+                            height: '700px',
+                            transform: 'translateZ(20px)'
+                          }}>
+                        
+                        {/* Screen bezel */}
+                        <div className="relative w-full h-full bg-black rounded-[3rem] overflow-hidden border-[6px] border-slate-900">
+                          {/* Notch */}
+                          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-40 h-7 bg-black rounded-b-3xl z-20 flex items-center justify-center space-x-2">
+                            <div className="w-16 h-1.5 bg-slate-800 rounded-full" />
+                            <div className="w-2.5 h-2.5 bg-slate-700 rounded-full" />
+                          </div>
+
+                          {/* Screen Content - HostMyShow App */}
+                          <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900">
+                            {/* Status bar */}
+                            <div className="flex justify-between items-center px-8 pt-2 text-white text-xs font-medium">
+                              <span>10:30</span>
+                              <div className="flex items-center space-x-1.5">
+                                <div className="flex space-x-0.5">
+                                  <div className="w-1 h-3 bg-white rounded-sm" />
+                                  <div className="w-1 h-3 bg-white rounded-sm" />
+                                  <div className="w-1 h-3 bg-white rounded-sm" />
+                                  <div className="w-1 h-3 bg-white rounded-sm" />
+                                </div>
+                                <span className="text-xs">100%</span>
+                              </div>
+                            </div>
+
+                            {/* App Header */}
+                            <div className="px-6 py-5 mt-4">
+                              <div className="flex items-center justify-between">
+                                <h2 className="text-3xl font-bold">
+                                  <span className="text-white">Host</span>
+                                  <span className="text-blue-400">MyShow</span>
+                                </h2>
+                                <div className="w-11 h-11 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg">
+                                  S
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Spotlight Event - Large Card */}
+                            <div className="px-6 mt-4">
+                              <div className="bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur-xl rounded-3xl overflow-hidden border border-blue-500/30 shadow-2xl">
+                                <div className="relative h-48 bg-gradient-to-br from-blue-900 via-blue-800 to-slate-900">
+                                  <div className="absolute top-4 left-1/2 -translate-x-1/2 px-5 py-1.5 bg-blue-600 rounded-full text-white text-xs font-bold tracking-wide shadow-lg">
+                                    SPOTLIGHT
+                                  </div>
+                                  {/* Stage/Audience illustration */}
+                                  <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-slate-900/80 to-transparent" />
+                                  <div className="absolute bottom-4 left-0 right-0 flex justify-center space-x-1">
+                                    <div className="w-12 h-12 bg-blue-600/30 rounded-full blur-sm" />
+                                    <div className="w-16 h-16 bg-cyan-500/30 rounded-full blur-sm" />
+                                    <div className="w-12 h-12 bg-blue-600/30 rounded-full blur-sm" />
+                                  </div>
+                                </div>
+                                <div className="p-5">
+                                  <h3 className="text-white font-bold text-2xl mb-2">DevCon 2025</h3>
+                                  <div className="flex items-center space-x-3 mb-2">
+                                    <span className="px-4 py-1.5 bg-blue-600 rounded-full text-white text-xs font-bold">hackathon</span>
+                                    <span className="text-blue-300 text-sm font-medium">12/9/2025</span>
+                                  </div>
+                                  <p className="text-blue-200/80 text-sm">Event HostAuditorium</p>
+                                </div>
+                              </div>
+
+                              {/* Event Cards Grid */}
+                              <div className="grid grid-cols-2 gap-4 mt-5">
+                                {/* Tech Meet Up */}
+                                <div className="bg-gradient-to-br from-slate-800/70 to-slate-900/70 backdrop-blur-xl rounded-2xl overflow-hidden border border-blue-500/20 shadow-xl">
+                                  <div className="relative h-28 bg-gradient-to-br from-blue-800 to-slate-900 overflow-hidden">
+                                    <div className="absolute inset-0 flex items-center justify-center">
+                                      <div className="w-20 h-20 bg-blue-500/20 rounded-full blur-xl" />
+                                    </div>
+                                  </div>
+                                  <div className="p-3">
+                                    <h4 className="text-white font-bold text-sm mb-2">Tech meet up</h4>
+                                    <span className="inline-block px-3 py-1 bg-blue-600 rounded-full text-white text-xs font-semibold mb-2">Live Show</span>
+                                    <p className="text-blue-200/70 text-xs">6/7/2025</p>
+                                    <p className="text-blue-200/60 text-xs mt-1">New York, NY</p>
+                                    <button className="w-full mt-3 py-2 bg-blue-600 hover:bg-blue-500 rounded-lg text-white text-xs font-bold transition-colors">
+                                      Book Now
+                                    </button>
+                                  </div>
+                                </div>
+
+                                {/* Comedy Show */}
+                                <div className="bg-gradient-to-br from-slate-800/70 to-slate-900/70 backdrop-blur-xl rounded-2xl overflow-hidden border border-purple-500/20 shadow-xl">
+                                  <div className="relative h-28 bg-gradient-to-br from-purple-800 to-slate-900 overflow-hidden">
+                                    <div className="absolute inset-0 flex items-center justify-center">
+                                      <div className="w-20 h-20 bg-purple-500/20 rounded-full blur-xl" />
+                                    </div>
+                                  </div>
+                                  <div className="p-3">
+                                    <h4 className="text-white font-bold text-sm mb-2">comedy show</h4>
+                                    <span className="inline-block px-3 py-1 bg-purple-600 rounded-full text-white text-xs font-semibold mb-2">Live Show</span>
+                                    <p className="text-blue-200/70 text-xs">15/7/2025</p>
+                                    <p className="text-blue-200/60 text-xs mt-1">nagar, bejhr</p>
+                                    <button className="w-full mt-3 py-2 bg-purple-600 hover:bg-purple-500 rounded-lg text-white text-xs font-bold transition-colors">
+                                      Book Now
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Power button */}
+                        <div className="absolute -right-1.5 top-32 w-1 h-16 bg-slate-700 rounded-l" style={{ transform: 'translateZ(10px)' }} />
+                        
+                        {/* Volume buttons */}
+                        <div className="absolute -left-1.5 top-24 w-1 h-12 bg-slate-700 rounded-r" style={{ transform: 'translateZ(10px)' }} />
+                        <div className="absolute -left-1.5 top-40 w-1 h-12 bg-slate-700 rounded-r" style={{ transform: 'translateZ(10px)' }} />
+                      </div>
+
+                      {/* Floating particles */}
+                      <div className="absolute -top-4 -left-8 w-3 h-3 bg-cyan-400 rounded-full blur-sm animate-ping" />
+                      <div className="absolute bottom-20 -right-8 w-2 h-2 bg-blue-400 rounded-full blur-sm animate-ping" style={{ animationDelay: '500ms' }} />
+                      <div className="absolute top-1/3 -right-12 w-4 h-4 bg-purple-400 rounded-full blur-sm animate-ping" style={{ animationDelay: '1000ms' }} />
                     </div>
                   </div>
-                  <p className="text-sm text-blue-200">Web Dashboard</p>
                 </div>
-                <div className="space-y-4">
-                  <div className="glass-dark rounded-2xl p-4 border border-blue-400/20 max-w-xs mx-auto">
-                    <div className="space-y-3">
-                      <div className="h-3 bg-blue-400/20 rounded w-full" />
-                      <div className="h-3 bg-blue-400/20 rounded w-2/3" />
-                      <div className="h-8 bg-blue-500/30 rounded-lg w-full" />
-                      <div className="grid grid-cols-2 gap-2">
-                        <div className="h-6 bg-blue-400/20 rounded" />
-                        <div className="h-6 bg-blue-400/20 rounded" />
+                {/* Right side - Title, Content and Button */}
+                <div className="flex flex-col items-start justify-center space-y-8 px-6 lg:pl-12">
+                  <h1 className="text-8xl font-bold leading-tight">
+                    <span className="text-white">Host</span>
+                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-cyan-400 to-purple-400">MyShow</span>
+                  </h1>
+
+                  <p className="text-blue-100/80 text-2xl font-light leading-relaxed max-w-xl">
+                    Discover and book amazing live events, workshops, and experiences right from your phone.
+                  </p>
+
+                  {/* Feature Highlights */}
+                  <div className="space-y-5 w-full max-w-xl">
+                    <div className="group flex items-start space-x-4 p-5 rounded-2xl bg-gradient-to-br from-slate-800/40 to-slate-900/40 backdrop-blur-sm border border-blue-500/20 hover:border-blue-500/40 transition-all hover:scale-[1.02]">
+                      <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                      </div>
+                      <div>
+                        <h3 className="text-white font-bold text-lg mb-1">Instant Booking</h3>
+                        <p className="text-blue-200/70 text-sm">Reserve your spot in seconds with our seamless booking experience</p>
+                      </div>
+                    </div>
+
+                    <div className="group flex items-start space-x-4 p-5 rounded-2xl bg-gradient-to-br from-slate-800/40 to-slate-900/40 backdrop-blur-sm border border-purple-500/20 hover:border-purple-500/40 transition-all hover:scale-[1.02]">
+                      <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                        </svg>
+                      </div>
+                      <div>
+                        <h3 className="text-white font-bold text-lg mb-1">Live Events</h3>
+                        <p className="text-blue-200/70 text-sm">Join thousands at concerts, shows, and exclusive gatherings</p>
+                      </div>
+                    </div>
+
+                    <div className="group flex items-start space-x-4 p-5 rounded-2xl bg-gradient-to-br from-slate-800/40 to-slate-900/40 backdrop-blur-sm border border-cyan-500/20 hover:border-cyan-500/40 transition-all hover:scale-[1.02]">
+                      <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-cyan-500 to-blue-500 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                        </svg>
+                      </div>
+                      <div>
+                        <h3 className="text-white font-bold text-lg mb-1">Secure & Trusted</h3>
+                        <p className="text-blue-200/70 text-sm">Your tickets and payments are protected with enterprise-grade security</p>
                       </div>
                     </div>
                   </div>
-                  <p className="text-sm text-blue-200">Mobile App</p>
+
+                  <button className="group relative px-10 py-5 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full font-bold text-white text-xl overflow-hidden transition-all hover:scale-105 hover:shadow-2xl hover:shadow-cyan-500/50">
+                    <span className="relative z-10">Browse Events</span>
+                    <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-cyan-600 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </button>
                 </div>
               </div>
-            </Card>
+            </div>
+
+            <style jsx>{`
+              @keyframes float {
+                0%, 100% {
+                  transform: rotateY(25deg) rotateX(8deg) rotateZ(-3deg) translateY(0px);
+                }
+                50% {
+                  transform: rotateY(25deg) rotateX(8deg) rotateZ(-3deg) translateY(-20px);
+                }
+              }
+            `}</style>
           </div>
         </div>
       </section>

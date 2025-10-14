@@ -48,7 +48,7 @@ const Landing = () => {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="container mx-auto px-4 py-20 text-center">
+      <section className="container mx-auto px-4 py-20 text-center mt-10">
         <div className="max-w-4xl mx-auto">
           <Badge variant="secondary" className="mb-6 px-4 py-2 glass text-blue-100 border-blue-400/30">
             <Sparkles className="w-4 h-4 mr-2" />
@@ -237,58 +237,14 @@ const Landing = () => {
                 </div>
                 {/* Right side - Title, Content and Button */}
                 <div className="flex flex-col items-start justify-center space-y-8 px-6 lg:pl-12">
-                  <h1 className="text-8xl font-bold leading-tight">
-                    <span className="text-white">Host</span>
-                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-cyan-400 to-purple-400">MyShow</span>
-                  </h1>
+      
 
                   <p className="text-blue-100/80 text-2xl font-light leading-relaxed max-w-xl">
                     Discover and book amazing live events, workshops, and experiences right from your phone.
                   </p>
 
-                  {/* Feature Highlights */}
-                  <div className="space-y-5 w-full max-w-xl">
-                    <div className="group flex items-start space-x-4 p-5 rounded-2xl bg-gradient-to-br from-slate-800/40 to-slate-900/40 backdrop-blur-sm border border-blue-500/20 hover:border-blue-500/40 transition-all hover:scale-[1.02]">
-                      <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                        <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                        </svg>
-                      </div>
-                      <div>
-                        <h3 className="text-white font-bold text-lg mb-1">Instant Booking</h3>
-                        <p className="text-blue-200/70 text-sm">Reserve your spot in seconds with our seamless booking experience</p>
-                      </div>
-                    </div>
-
-                    <div className="group flex items-start space-x-4 p-5 rounded-2xl bg-gradient-to-br from-slate-800/40 to-slate-900/40 backdrop-blur-sm border border-purple-500/20 hover:border-purple-500/40 transition-all hover:scale-[1.02]">
-                      <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                        <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                        </svg>
-                      </div>
-                      <div>
-                        <h3 className="text-white font-bold text-lg mb-1">Live Events</h3>
-                        <p className="text-blue-200/70 text-sm">Join thousands at concerts, shows, and exclusive gatherings</p>
-                      </div>
-                    </div>
-
-                    <div className="group flex items-start space-x-4 p-5 rounded-2xl bg-gradient-to-br from-slate-800/40 to-slate-900/40 backdrop-blur-sm border border-cyan-500/20 hover:border-cyan-500/40 transition-all hover:scale-[1.02]">
-                      <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-cyan-500 to-blue-500 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                        <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                        </svg>
-                      </div>
-                      <div>
-                        <h3 className="text-white font-bold text-lg mb-1">Secure & Trusted</h3>
-                        <p className="text-blue-200/70 text-sm">Your tickets and payments are protected with enterprise-grade security</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <button className="group relative px-10 py-5 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full font-bold text-white text-xl overflow-hidden transition-all hover:scale-105 hover:shadow-2xl hover:shadow-cyan-500/50">
-                    <span className="relative z-10">Browse Events</span>
-                    <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-cyan-600 opacity-0 group-hover:opacity-100 transition-opacity" />
-                  </button>
+                
+                
                 </div>
               </div>
             </div>

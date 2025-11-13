@@ -22,19 +22,32 @@ app.use(cookieParser());
 
 //Razorpay Setup 
 import Razorpay from "razorpay"
-export const razorpayInstance = new Razorpay({
-    key_id : process.env.RAZORPAY_KEY,
-    key_secret : process.env.RAZORPAY_KEY_SECRET
-})
+let razorpayInstance = null;
+
+if (process.env.NODE_ENV !== "test") {
+    razorpayInstance = new Razorpay({
+        key_id : process.env.RAZORPAY_KEY,
+        key_secret : process.env.RAZORPAY_KEY_SECRET
+    });
+}
+
+export { razorpayInstance };
 
 //Gemini Setup
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { geminiTools } from "./services/gemini/tools.js";
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-export const model = genAI.getGenerativeModel({
-    model : "gemini-2.0-flash",
-    tools : geminiTools
-})
+let model = null;
+
+if (process.env.NODE_ENV !== "test") {
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+    model = genAI.getGenerativeModel({
+        model : "gemini-2.0-flash",
+        tools : geminiTools
+    });
+}
+
+export { model };
+
 
 //Routes Setup
 import userRouter from "./routes/user.routes.js"

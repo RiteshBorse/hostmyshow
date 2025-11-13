@@ -1,4 +1,4 @@
-import { model } from "../index.js";
+import { model } from "../app.js";
 import { Event } from "../models/events.model.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 

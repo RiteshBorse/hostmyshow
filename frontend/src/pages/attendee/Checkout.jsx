@@ -59,8 +59,14 @@ const Checkout = () => {
       description: "Test Mode",
       order_id: data.id,
       handler: async (response) => {
-        console.log("response", response)
+        console.log("Payment verify response : ", response)
         try {
+          const res = await axios.post(`${import.meta.env.VITE_API}/payment/verify`, {
+            razorpay_order_id: response.razorpay_order_id,
+            razorpay_payment_id: response.razorpay_payment_id,
+            razorpay_signature: response.razorpay_signature,
+          });
+          
           const ticket = await axios.post(`${import.meta.env.VITE_API}/events/book-ticket`, {
             event_id: id,
             booking_dateTime: new Date().toISOString(),
@@ -73,11 +79,7 @@ const Checkout = () => {
             toast.error(ticket.data.message);
             return ;
           }
-          const res = await axios.post(`${import.meta.env.VITE_API}/payment/verify`, {
-            razorpay_order_id: response.razorpay_order_id,
-            razorpay_payment_id: response.razorpay_payment_id,
-            razorpay_signature: response.razorpay_signature,
-          });
+          
 
           if (ticket.data.message) {
             toast.success(ticket.data.message);

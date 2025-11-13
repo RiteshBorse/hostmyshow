@@ -8,6 +8,7 @@ import { areArraysEqual } from "../utils/arrayUtils.js";
 import { confirmationFormat, mail } from "../utils/email.js";
 import dayjs from 'dayjs';
 import mongoose from 'mongoose';
+import { Payment } from "../models/payment.model.js";
 
 const getEvents = asyncHandler(async (req, res) => {
   let events = await Event.find({}).select(
@@ -417,6 +418,14 @@ const bookTicket = asyncHandler(async (req, res) => {
     });
   }
 
+  let checkPayment = await Payment.findOne({razorpay_payment_id : payment_id});
+  if(!checkPayment){
+    return res.status(400).send({
+      message : "Payment is not completed",
+      success : false
+    })
+  }
+  console.log(checkPayment);
   const seatList = seats.split(',').map(s => s.trim());
 
   try {
